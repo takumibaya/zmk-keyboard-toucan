@@ -85,12 +85,12 @@
             label = "NAV";
         };
 
-        mouse {
+        ctrl {
             bindings = <
 &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-20)  &kp LG(LEFT_BRACKET)  &trans  &kp LG(RIGHT_BRACKET)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(20)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_X(-20)  &msc MOVE_X(20)  &mkp MCLK  &trans  &trans  &trans  &trans  &trans  &tog 0  &mkp LCLK  &mkp RCLK  &trans
             >;
 
-            label = "MOUSE";
+            label = "Ctrl";
         };
 
         adj {
