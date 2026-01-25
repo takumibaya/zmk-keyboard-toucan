@@ -73,7 +73,7 @@
         nav {
             display-name = "SYM";
             bindings = <
-&kp TAB  &kp EXCL  &kp AT  &kp HASH  &kp DLLR  &kp PRCNT  &kp CARET  &kp AMPS  &kp KP_MULTIPLY  &kp LPAR  &kp RPAR  &kp BSPC  &kp LCTRL  &trans  &trans  &trans  &trans  &trans  &kp MINUS  &kp EQUAL  &kp LBKT  &kp RBKT  &kp BSLH  &kp GRAVE  &kp LSHFT  &trans  &trans  &trans  &trans  &trans  &kp UNDER  &kp PLUS  &kp LBRC  &kp RBRC  &kp PIPE  &kp TILDE  &trans  &lt 5 BACKSPACE  &trans  &trans  &none  &trans
+&kp TAB  &kp EXCL  &kp LEFT_BRACKET  &kp GRAVE  &kp RIGHT_BRACKET  &kp AT_SIGN  &kp CARET  &kp ESCAPE  &kp UP_ARROW  &kp CAPS  &kp PG_UP  &kp HOME  &kp LCTRL  &kp HASH  &mt LCTRL LEFT_PARENTHESIS  &mt LEFT_ALT SQT  &mt LSHIFT RIGHT_PARENTHESIS  &kp AMPERSAND  &kp MINUS  &kp LEFT_ARROW  &kp DOWN  &kp RIGHT  &kp PAGE_DOWN  &kp END  &kp LSHFT  &kp NON_US_BACKSLASH  &kp LEFT_BRACE  &kp DOUBLE_QUOTES  &kp RIGHT_BRACE  &kp PIPE  &kp UNDER  &kp PLUS  &none  &none  &none  &none  &trans  &lt 5 BACKSPACE  &trans  &trans  &none  &trans
             >;
 
             label = "NAV";
