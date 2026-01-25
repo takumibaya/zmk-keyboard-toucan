@@ -44,17 +44,21 @@
     keymap {
         compatible = "zmk,keymap";
 
-        onishi {
+        base {
             bindings = <
 &trans  &kp Q  &kp L  &kp U  &kp COMMA  &kp PERIOD  &kp F  &kp W  &kp R  &kp Y  &kp P  &trans  &trans  &kp E  &mt LCTRL I  &mt LEFT_ALT A  &mt LEFT_SHIFT O  &kp MINUS  &kp K  &mt LS(RSHIFT) T  &mt RIGHT_ALT N  &mt RCTRL S  &kp H  &trans  &to 1  &kp Z  &kp X  &kp C  &kp V  &kp SEMICOLON  &kp G  &kp D  &kp M  &kp J  &kp B  &trans  &trans  &lt 2 LG(BACKSPACE)  &mt LEFT_COMMAND SPACE  &mt RIGHT_COMMAND ENTER  &lt 3 TAB  &trans
             >;
+
+            label = "BASE";
         };
 
-        base {
+        qwert {
             display-name = "BASE";
             bindings = <
 &kp TAB  &kp Q  &kp W  &kp E  &kp R  &kp T  &kp Y  &kp U  &kp I  &kp O  &kp P  &kp BSPC  &kp LCTRL  &kp A  &kp S  &kp D  &kp F  &kp G  &kp H  &kp J  &kp K  &kp L  &kp SEMI  &kp SQT  &kp LSHFT  &kp Z  &kp X  &kp C  &kp V  &kp B  &kp N  &kp M  &kp COMMA  &kp DOT  &kp FSLH  &kp ESC  &kp LGUI  &mo 2  &kp SPACE  &kp RET  &mo 3  &kp RALT
             >;
+
+            label = "QWERT";
         };
 
         num {
@@ -62,13 +66,17 @@
             bindings = <
 &kp ESCAPE  &trans  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp N5  &kp CARET  &kp LESS_THAN  &kp EQUAL  &kp GREATER_THAN  &trans  &trans  &kp LCTRL  &kp NUMBER_0  &mt LCTRL NUMBER_4  &mt LALT NUMBER_5  &mt LSHIFT NUMBER_6  &bt BT_SEL 4  &kp PERCENT  &mt RSHIFT PLUS  &mt RALT MINUS  &mt RCTRL ASTERISK  &kp SLASH  &trans  &trans  &kp DOLLAR  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &trans  &kp UNDERSCORE  &kp EXCLAMATION  &kp QUESTION  &kp COLON  &kp SEMICOLON  &trans  &trans  &none  &trans  &trans  &lt 4 SPACE  &trans
             >;
+
+            label = "NUM";
         };
 
-        sym {
+        nav {
             display-name = "SYM";
             bindings = <
-&kp TAB  &kp EXCL  &kp AT  &kp HASH  &kp DLLR  &kp PRCNT  &kp CARET  &kp AMPS  &kp KP_MULTIPLY  &kp LPAR  &kp RPAR  &kp BSPC  &kp LCTRL  &trans  &trans  &trans  &trans  &trans  &kp MINUS  &kp EQUAL  &kp LBKT  &kp RBKT  &kp BSLH  &kp GRAVE  &kp LSHFT  &trans  &trans  &trans  &trans  &trans  &kp UNDER  &kp PLUS  &kp LBRC  &kp RBRC  &kp PIPE  &kp TILDE  &kp LGUI  &trans  &kp SPACE  &kp RET  &trans  &kp RALT
+&kp TAB  &kp EXCL  &kp AT  &kp HASH  &kp DLLR  &kp PRCNT  &kp CARET  &kp AMPS  &kp KP_MULTIPLY  &kp LPAR  &kp RPAR  &kp BSPC  &kp LCTRL  &trans  &trans  &trans  &trans  &trans  &kp MINUS  &kp EQUAL  &kp LBKT  &kp RBKT  &kp BSLH  &kp GRAVE  &kp LSHFT  &trans  &trans  &trans  &trans  &trans  &kp UNDER  &kp PLUS  &kp LBRC  &kp RBRC  &kp PIPE  &kp TILDE  &trans  &lt 5 BACKSPACE  &trans  &trans  &none  &trans
             >;
+
+            label = "NAV";
         };
 
         adj {
