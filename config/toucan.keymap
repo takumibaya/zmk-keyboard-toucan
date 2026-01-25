@@ -45,6 +45,11 @@
             key-positions = <12 24>;
             layers = <1>;
         };
+
+        unlock {
+            bindings = <&studio_unlock>;
+            key-positions = <0 1>;
+        };
     };
 
     keymap {
