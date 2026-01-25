@@ -60,7 +60,7 @@
         nav {
             display-name = "NAV";
             bindings = <
-&kp TAB  &trans  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp N5  &kp CARET  &kp LESS_THAN  &kp EQUAL  &kp GREATER_THAN  &trans  &trans  &kp LCTRL  &kp NUMBER_0  &mt LCTRL NUMBER_4  &mt LALT NUMBER_5  &mt LSHIFT NUMBER_6  &bt BT_SEL 4  &kp PERCENT  &mt RSHIFT PLUS  &mt RALT MINUS  &mt RCTRL ASTERISK  &kp SLASH  &trans  &kp LSHFT  &kp DOLLAR  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &trans  &kp UNDERSCORE  &kp EXCLAMATION  &kp QUESTION  &kp COLON  &kp SEMICOLON  &trans  &kp LGUI  &trans  &kp SPACE  &kp RET  &trans  &kp RALT
+&kp TAB  &trans  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp N5  &kp CARET  &kp LESS_THAN  &kp EQUAL  &kp GREATER_THAN  &trans  &trans  &kp LCTRL  &kp NUMBER_0  &mt LCTRL NUMBER_4  &mt LALT NUMBER_5  &mt LSHIFT NUMBER_6  &bt BT_SEL 4  &kp PERCENT  &mt RSHIFT PLUS  &mt RALT MINUS  &mt RCTRL ASTERISK  &kp SLASH  &trans  &kp LSHFT  &kp DOLLAR  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &trans  &kp UNDERSCORE  &kp EXCLAMATION  &kp QUESTION  &kp COLON  &kp SEMICOLON  &trans  &trans  &none  &trans  &trans  &lt 4 SPACE  &trans
             >;
         };
 
