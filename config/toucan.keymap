@@ -24,12 +24,12 @@
 
         combo-gui+space {
             bindings = <&kp LG(SPACE)>;
-            key-positions = <37 16>;
+            key-positions = <16 36>;
         };
 
         combo-alt+space {
             bindings = <&kp LA(SPACE)>;
-            key-positions = <19 40>;
+            key-positions = <19 41>;
         };
 
         combo-lang2 {
