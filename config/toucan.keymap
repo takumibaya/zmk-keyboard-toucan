@@ -17,6 +17,20 @@
         };
     };
 
+    combos {
+        compatible = "zmk,combos";
+
+        gui+space {
+            bindings = <&kp LG(SPACE)>;
+            key-positions = <37 16>;
+        };
+
+        alt+space {
+            bindings = <&kp LA(SPACE)>;
+            key-positions = <19 40>;
+        };
+    };
+
     keymap {
         compatible = "zmk,keymap";
 
