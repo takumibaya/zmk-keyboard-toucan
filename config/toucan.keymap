@@ -20,14 +20,24 @@
     combos {
         compatible = "zmk,combos";
 
-        gui+space {
+        combo-gui+space {
             bindings = <&kp LG(SPACE)>;
             key-positions = <37 16>;
         };
 
-        alt+space {
+        combo-alt+space {
             bindings = <&kp LA(SPACE)>;
             key-positions = <19 40>;
+        };
+
+        combo-lang2 {
+            bindings = <&kp LANG2>;
+            key-positions = <3 2>;
+        };
+
+        combo-lang1 {
+            bindings = <&kp LANG1>;
+            key-positions = <8 9>;
         };
     };
 
