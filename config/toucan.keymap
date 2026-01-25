@@ -1,6 +1,7 @@
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/pointing.h>
 
 #define BASE 0
 #define NAV  1
@@ -13,7 +14,7 @@
 
         tri_layer {
             if-layers = <2 3>;
-            then-layer = <4>;
+            then-layer = <5>;
         };
     };
 
@@ -64,7 +65,7 @@
         num {
             display-name = "NAV";
             bindings = <
-&kp ESCAPE  &trans  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp PERIOD  &kp CARET  &kp LESS_THAN  &kp EQUAL  &kp GREATER_THAN  &trans  &trans  &kp LCTRL  &kp NUMBER_0  &mt LCTRL NUMBER_4  &mt LALT NUMBER_5  &mt LSHIFT NUMBER_6  &kp TILDE  &kp PERCENT  &mt RSHIFT PLUS  &mt RALT MINUS  &mt RCTRL ASTERISK  &kp SLASH  &trans  &trans  &kp DOLLAR  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp COMMA  &kp UNDERSCORE  &kp EXCLAMATION  &kp QUESTION  &kp COLON  &kp SEMICOLON  &trans  &trans  &none  &trans  &trans  &lt 4 SPACE  &trans
+&kp ESCAPE  &trans  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp PERIOD  &kp CARET  &kp LESS_THAN  &kp EQUAL  &kp GREATER_THAN  &trans  &trans  &kp LCTRL  &kp NUMBER_0  &mt LCTRL NUMBER_4  &mt LALT NUMBER_5  &mt LSHIFT NUMBER_6  &kp TILDE  &kp PERCENT  &mt RSHIFT PLUS  &mt RALT MINUS  &mt RCTRL ASTERISK  &kp SLASH  &trans  &trans  &kp DOLLAR  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp COMMA  &kp UNDERSCORE  &kp EXCLAMATION  &kp QUESTION  &kp COLON  &kp SEMICOLON  &trans  &trans  &none  &trans  &trans  &lt 5 SPACE  &trans
             >;
 
             label = "NUM";
@@ -73,10 +74,18 @@
         nav {
             display-name = "SYM";
             bindings = <
-&kp TAB  &kp EXCL  &kp LEFT_BRACKET  &kp GRAVE  &kp RIGHT_BRACKET  &kp AT_SIGN  &kp CARET  &kp ESCAPE  &kp UP_ARROW  &kp CAPS  &kp PG_UP  &kp HOME  &kp LCTRL  &kp HASH  &mt LCTRL LEFT_PARENTHESIS  &mt LEFT_ALT SQT  &mt LSHIFT RIGHT_PARENTHESIS  &kp AMPERSAND  &kp MINUS  &kp LEFT_ARROW  &kp DOWN  &kp RIGHT  &kp PAGE_DOWN  &kp END  &kp LSHFT  &kp NON_US_BACKSLASH  &kp LEFT_BRACE  &kp DOUBLE_QUOTES  &kp RIGHT_BRACE  &kp PIPE  &kp UNDER  &kp PLUS  &none  &none  &none  &none  &trans  &lt 4 BACKSPACE  &trans  &trans  &none  &trans
+&kp TAB  &kp EXCL  &kp LEFT_BRACKET  &kp GRAVE  &kp RIGHT_BRACKET  &kp AT_SIGN  &kp CARET  &kp ESCAPE  &kp UP_ARROW  &kp CAPS  &kp PG_UP  &kp HOME  &kp LCTRL  &kp HASH  &mt LCTRL LEFT_PARENTHESIS  &mt LEFT_ALT SQT  &mt LSHIFT RIGHT_PARENTHESIS  &kp AMPERSAND  &kp MINUS  &kp LEFT_ARROW  &kp DOWN  &kp RIGHT  &kp PAGE_DOWN  &kp END  &kp LSHFT  &kp NON_US_BACKSLASH  &kp LEFT_BRACE  &kp DOUBLE_QUOTES  &kp RIGHT_BRACE  &kp PIPE  &kp UNDER  &kp PLUS  &none  &none  &none  &none  &trans  &lt 5 BACKSPACE  &trans  &trans  &none  &trans
             >;
 
             label = "NAV";
+        };
+
+        mouse {
+            bindings = <
+&trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-20)  &kp LG(LEFT_BRACKET)  &trans  &kp LG(RIGHT_BRACKET)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(20)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_X(-20)  &msc MOVE_X(20)  &mkp MCLK  &trans  &trans  &trans  &trans  &trans  &trans  &mkp LCLK  &mkp RCLK  &trans
+            >;
+
+            label = "MOUSE";
         };
 
         adj {
