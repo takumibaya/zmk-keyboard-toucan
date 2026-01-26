@@ -102,7 +102,7 @@
         adj {
             display-name = "ADJ";
             bindings = <
-&mo 0  &kp LA(LC(R))  &kp LA(LC(Q))  &kp LA(LC(W))  &kp LC(LA(E))  &kp LA(LC(LEFT_ARROW))  &kp C_VOL_UP  &kp F1  &kp F2  &kp F3  &kp F10  &kp C_BRI_UP  &kp LCTRL  &kp LA(LC(F))  &kp LA(LC(A))  &kp LA(LC(S))  &kp LA(LC(D))  &kp LC(LA(RIGHT))  &kp C_VOL_DN  &kp F4  &kp F5  &kp F6  &kp F11  &kp C_BRI_DN  &trans  &kp LA(LC(V))  &kp LA(LC(V))  &kp LA(LC(Z))  &kp LC(LA(X))  &kp LA(LC(C))  &kp F7  &kp F8  &kp F9  &kp F12  &trans  &trans  &none  &none  &none  &none  &trans  &trans
+&mo 0  &kp LA(LC(R))  &kp LA(LC(Q))  &kp LA(LC(W))  &kp LC(LA(E))  &kp LA(LC(LEFT_ARROW))  &kp C_VOL_UP  &kp F1  &kp F2  &kp F3  &kp F10  &kp C_BRI_UP  &kp LCTRL  &kp LA(LC(F))  &kp LA(LC(A))  &kp LA(LC(S))  &kp LA(LC(D))  &kp LC(LA(RIGHT))  &kp C_VOL_DN  &kp F4  &kp F5  &kp F6  &kp F11  &kp C_BRI_DN  &trans  &kp LA(LC(V))  &kp LA(LC(Z))  &kp LA(LC(X))  &kp LC(LA(C))  &kp LA(LC(V))  &kp F7  &kp F8  &kp F9  &kp F12  &trans  &trans  &none  &kp LC(LA(C))  &none  &none  &trans  &trans
             >;
         };
 
