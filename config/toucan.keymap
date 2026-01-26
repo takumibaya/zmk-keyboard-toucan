@@ -36,12 +36,7 @@
             key-positions = <8 9>;
         };
 
-        qwerty {
-            bindings = <&to 1>;
-            key-positions = <11 10>;
-        };
-
-        ble-layer {
+        to-base {
             bindings = <&to 0>;
             key-positions = <12 24>;
             layers = <1>;
@@ -50,6 +45,11 @@
         unlock {
             bindings = <&studio_unlock>;
             key-positions = <0 1>;
+        };
+
+        to-qwerty {
+            bindings = <&to 1>;
+            key-positions = <35 23>;
         };
     };
 
