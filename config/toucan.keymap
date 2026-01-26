@@ -58,7 +58,7 @@
 
         base {
             bindings = <
-&trans  &kp Q  &kp L  &kp U  &kp COMMA  &kp PERIOD  &kp F  &kp W  &kp R  &kp Y  &kp P  &trans  &trans  &kp E  &mt LCTRL I  &mt LEFT_ALT A  &mt LEFT_SHIFT O  &kp MINUS  &kp K  &mt LS(RSHIFT) T  &mt RIGHT_ALT N  &mt RCTRL S  &kp H  &mo 6  &to 1  &kp Z  &kp X  &kp C  &kp V  &kp SEMICOLON  &kp G  &kp D  &kp M  &kp J  &kp B  &trans  &mo 4  &lt 2 BACKSPACE  &mt LEFT_COMMAND SPACE  &mt RIGHT_COMMAND ENTER  &lt 3 TAB  &tog 4
+&trans  &kp Q  &kp L  &kp U  &kp COMMA  &kp PERIOD  &kp F  &kp W  &kp R  &kp Y  &kp P  &trans  &trans  &kp E  &mt LCTRL I  &mt LEFT_ALT A  &mt LEFT_SHIFT O  &kp MINUS  &kp K  &mt LS(RSHIFT) T  &mt RIGHT_ALT N  &mt RCTRL S  &kp H  &mo 6  &trans  &kp Z  &kp X  &kp C  &kp V  &kp SEMICOLON  &kp G  &kp D  &kp M  &kp J  &kp B  &trans  &mo 4  &lt 2 BACKSPACE  &mt LEFT_COMMAND SPACE  &mt RIGHT_COMMAND ENTER  &lt 3 TAB  &tog 4
             >;
 
             label = "BASE";
