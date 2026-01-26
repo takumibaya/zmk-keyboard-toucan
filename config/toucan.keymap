@@ -108,7 +108,7 @@
 
         setting {
             bindings = <
-&kp  &kp  &kp LG(LS(NUMBER_2))  &kp  &kp  &kp  &kp  &kp  &kp  &kp  &bt BT_PRV  &bt BT_NXT  &kp  &kp  &kp  &kp  &kp  &kp  &kp  &kp LG(LS(NUMBER_2))  &kp LG(LS(NUMBER_3))  &kp LG(LS(NUMBER_4))  &kp  &kp  &kp  &kp  &kp  &kp  &kp  &kp  &kp  &kp  &kp  &kp  &bt BT_CLR  &bt BT_CLR_ALL  &kp  &kp  &kp  &kp  &kp  &kp
+&kp  &kp  &none  &kp  &kp  &kp  &kp  &kp C_VOL_DN  &kp  &kp C_VOL_UP  &bt BT_PRV  &bt BT_NXT  &kp  &kp  &kp  &kp  &kp  &kp  &kp  &kp LG(LS(NUMBER_2))  &kp LG(LS(NUMBER_3))  &kp LG(LS(NUMBER_4))  &kp  &kp  &kp  &kp  &kp  &kp  &kp  &kp  &kp  &kp C_BRI_DN  &kp  &kp C_BRI_UP  &bt BT_CLR  &bt BT_CLR_ALL  &kp  &kp  &kp  &kp  &kp  &kp
             >;
 
             label = "set";
