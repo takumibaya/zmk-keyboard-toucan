@@ -11,6 +11,18 @@
 #define ADJ   5
 
 / {
+    behaviors {
+        hm: homerow_mods {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            tapping-term-ms = <225>;
+            quick-tap-ms = <200>;
+            require-prior-idle-ms = <150>;
+            flavor = "tap-preferred";
+            bindings = <&kp>, <&kp>;
+        };
+    };
+
     conditional_layers { compatible = "zmk,conditional-layers"; };
 
     combos {
@@ -67,7 +79,7 @@
         qwert {
             display-name = "BASE";
             bindings = <
-&kp TAB  &kp Q  &kp W  &kp E  &kp R  &kp T  &kp Y  &kp U  &kp I  &kp O  &kp P  &kp BSPC  &kp LCTRL  &kp A  &mt LCTRL S  &mt LALT D  &mt LSHIFT F  &kp G  &kp H  &mt RSHIFT J  &mt RALT K  &mt RCTRL L  &kp SEMI  &kp SQT  &kp LSHFT  &kp Z  &kp X  &kp C  &kp V  &kp B  &kp N  &kp M  &kp COMMA  &kp DOT  &kp FSLH  &kp ESC  &mo 4  &lt 2 BACKSPACE  &mt LEFT_COMMAND SPACE  &mt RIGHT_COMMAND ENTER  &lt 3 TAB  &mkp LCLK
+&kp TAB  &kp Q  &kp W  &kp E  &kp R  &kp T  &kp Y  &kp U  &kp I  &kp O  &kp P  &kp BSPC  &kp LCTRL  &kp A  &hm LCTRL S  &hm LALT D  &hm LSHIFT F  &kp G  &kp H  &hm RSHIFT J  &hm RALT K  &hm RCTRL L  &kp SEMI  &kp SQT  &kp LSHFT  &kp Z  &kp X  &kp C  &kp V  &kp B  &kp N  &kp M  &kp COMMA  &kp DOT  &kp FSLH  &kp ESC  &mo 4  &lt 2 BACKSPACE  &hm LEFT_COMMAND SPACE  &hm RIGHT_COMMAND ENTER  &lt 3 TAB  &mkp LCLK
             >;
 
             label = "QWERT";
@@ -76,7 +88,7 @@
         num {
             display-name = "NAV";
             bindings = <
-&kp ESCAPE  &trans  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp PERIOD  &kp CARET  &kp LESS_THAN  &kp EQUAL  &kp GREATER_THAN  &trans  &trans  &kp LCTRL  &kp NUMBER_0  &mt LCTRL NUMBER_4  &mt LALT NUMBER_5  &mt LSHIFT NUMBER_6  &kp TILDE  &kp PERCENT  &mt RSHIFT PLUS  &mt RALT MINUS  &mt RCTRL ASTERISK  &kp SLASH  &trans  &trans  &kp DOLLAR  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp COMMA  &kp UNDERSCORE  &kp EXCLAMATION  &kp QUESTION  &kp COLON  &kp SEMICOLON  &trans  &none  &trans  &trans  &trans  &lt 7 SPACE  &trans
+&kp ESCAPE  &trans  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp PERIOD  &kp CARET  &kp LESS_THAN  &kp EQUAL  &kp GREATER_THAN  &trans  &trans  &kp LCTRL  &kp NUMBER_0  &hm LCTRL NUMBER_4  &hm LALT NUMBER_5  &hm LSHIFT NUMBER_6  &kp TILDE  &kp PERCENT  &hm RSHIFT PLUS  &hm RALT MINUS  &hm RCTRL ASTERISK  &kp SLASH  &trans  &trans  &kp DOLLAR  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp COMMA  &kp UNDERSCORE  &kp EXCLAMATION  &kp QUESTION  &kp COLON  &kp SEMICOLON  &trans  &none  &trans  &trans  &trans  &lt 7 SPACE  &trans
             >;
 
             label = "NUM";
@@ -85,7 +97,7 @@
         nav {
             display-name = "SYM";
             bindings = <
-&kp TAB  &kp EXCL  &kp LEFT_BRACKET  &kp GRAVE  &kp RIGHT_BRACKET  &kp AT_SIGN  &kp CARET  &kp ESCAPE  &kp UP_ARROW  &kp CAPS  &kp PG_UP  &kp HOME  &kp LCTRL  &kp HASH  &mt LCTRL LEFT_PARENTHESIS  &mt LEFT_ALT SQT  &mt LSHIFT RIGHT_PARENTHESIS  &kp AMPERSAND  &kp MINUS  &kp LEFT_ARROW  &kp DOWN  &kp RIGHT  &kp PAGE_DOWN  &kp END  &kp LSHFT  &kp NON_US_BACKSLASH  &kp LEFT_BRACE  &kp DOUBLE_QUOTES  &kp RIGHT_BRACE  &kp PIPE  &kp UNDER  &kp PLUS  &none  &none  &none  &none  &trans  &lt 7 BACKSPACE  &trans  &trans  &trans  &none
+&kp TAB  &kp EXCL  &kp LEFT_BRACKET  &kp GRAVE  &kp RIGHT_BRACKET  &kp AT_SIGN  &kp CARET  &kp ESCAPE  &kp UP_ARROW  &kp CAPS  &kp PG_UP  &kp HOME  &kp LCTRL  &kp HASH  &hm LCTRL LEFT_PARENTHESIS  &hm LEFT_ALT SQT  &hm LSHIFT RIGHT_PARENTHESIS  &kp AMPERSAND  &kp MINUS  &kp LEFT_ARROW  &kp DOWN  &kp RIGHT  &kp PAGE_DOWN  &kp END  &kp LSHFT  &kp NON_US_BACKSLASH  &kp LEFT_BRACE  &kp DOUBLE_QUOTES  &kp RIGHT_BRACE  &kp PIPE  &kp UNDER  &kp PLUS  &none  &none  &none  &none  &trans  &lt 7 BACKSPACE  &trans  &trans  &trans  &none
             >;
 
             label = "NAV";
