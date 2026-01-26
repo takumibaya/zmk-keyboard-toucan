@@ -40,7 +40,7 @@
             key-positions = <11 10>;
         };
 
-        to-base {
+        ble-layer {
             bindings = <&to 0>;
             key-positions = <12 24>;
             layers = <1>;
