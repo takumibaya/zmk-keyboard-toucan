@@ -134,6 +134,6 @@
 
 &zip_gestures {
     inertial-cursor;
-    inertial-cursor-velocity-threshold-ms = <20>;
-    inertial-cursor-decay-percent = <95>;
+    inertial-cursor-velocity-threshold = <2>;
+    inertial-cursor-decay-percent = <20>;
 };
