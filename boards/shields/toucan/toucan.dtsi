@@ -114,8 +114,8 @@
             layers = <1 2>;
             input-processors = <
                 &zip_xy_to_scroll_mapper
-                &zip_scroll_scaler 1 5
-                &zip_scroll_transform INPUT_TRANSFORM_X_INVERT
+                &zip_scroll_scaler 1 7
+                &zip_scroll_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)
             >;
         };
 
@@ -141,5 +141,5 @@
     tap-timout-ms = <120>;
     
     inertial-cursor-velocity-threshold = <20>;
-    inertial-cursor-decay-percent = <40>;
+    inertial-cursor-decay-percent = <37>;
 };
