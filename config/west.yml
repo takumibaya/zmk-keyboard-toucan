@@ -10,8 +10,8 @@ manifest:
       url-base: https://github.com/caksoylar
     - name: geeksville
       url-base: https://github.com/geeksville
-    - name: badjeff
-      url-base: https://github.com/badjeff
+    - name: halfdane
+      url-base: https://github.com/halfdane
   projects:
     - name: zmk
       remote: zmkfirmware
@@ -23,7 +23,7 @@ manifest:
       remote: caksoylar
       revision: main
     - name: zmk-input-gestures
-      remote: badjeff
+      remote: halfdane
       revision: main
   self:
     path: config
