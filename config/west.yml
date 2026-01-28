@@ -23,7 +23,7 @@ manifest:
       remote: caksoylar
       revision: main
     - name: zmk-input-gestures
-      remote: takumibaya
+      url: https://github.com/takumibaya/zmk-input-gestures
       revision: main
   self:
     path: config
