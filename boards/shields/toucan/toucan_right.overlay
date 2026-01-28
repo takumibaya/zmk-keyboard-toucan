@@ -65,7 +65,6 @@
         sensitivity = "3x";
         x-invert;
         y-invert;
-        tap;  // ← ここに追加
     };
 };
 
