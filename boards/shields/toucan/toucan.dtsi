@@ -108,13 +108,16 @@
         compatible = "zmk,input-listener";
         status = "disabled";
         device = <&glidepoint_split>;
-        input-processors = <&zip_gestures>, <&zip_xy_scaler 250 100>;  // ← &zip_gestures を先頭に追加
+        input-processors = <&zip_gestures>, <&zip_xy_scaler 100 100>;  // 等倍に下げる
         scroller {
             layers = <1 2>;
             input-processors = <
                 &zip_xy_to_scroll_mapper
                 &zip_scroll_scaler 1 5
                 &zip_scroll_transform INPUT_TRANSFORM_X_INVERT
+        >;
+    };
+};
             >;
         };
     };
@@ -124,8 +127,7 @@
     inertial-cursor;
     tap-detection;
     tap-timout-ms = <120>;
-
-    // 慣性カーソル調整
-    inertial-cursor-velocity-threshold = <20>;  // 発動閾値（低いほど発動しやすい）
-    inertial-cursor-decay-percent = <85>;       // 減衰率（小さいほど長く滑る）
+    
+    inertial-cursor-velocity-threshold = <15>;
+    inertial-cursor-decay-percent = <70>;
 };
