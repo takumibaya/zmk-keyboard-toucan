@@ -88,7 +88,7 @@
         num {
             display-name = "NAV";
             bindings = <
-&kp ESCAPE  &trans  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp PERIOD  &kp CARET  &kp LESS_THAN  &kp EQUAL  &kp GREATER_THAN  &trans  &trans  &kp LCTRL  &kp NUMBER_0  &hm LCTRL NUMBER_4  &hm LALT NUMBER_5  &hm LSHIFT NUMBER_6  &kp TILDE  &kp PERCENT  &hm RSHIFT PLUS  &hm RALT MINUS  &hm RCTRL ASTERISK  &kp SLASH  &trans  &trans  &kp DOLLAR  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp COMMA  &kp UNDERSCORE  &kp EXCLAMATION  &kp QUESTION  &kp COLON  &kp SEMICOLON  &trans  &none  &trans  &trans  &trans  &lt 7 SPACE  &trans
+&kp ESCAPE  &trans  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp PERIOD  &kp CARET  &kp LESS_THAN  &kp EQUAL  &kp GREATER_THAN  &trans  &trans  &kp LCTRL  &kp NUMBER_0  &hm LCTRL NUMBER_4  &hm LALT NUMBER_5  &hm LSHIFT NUMBER_6  &kp TILDE  &kp PERCENT  &hm RSHIFT PLUS  &hm RALT MINUS  &hm RCTRL ASTERISK  &kp SLASH  &trans  &trans  &kp DOLLAR  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp COMMA  &kp UNDERSCORE  &kp EXCLAMATION  &kp QUESTION  &kp COLON  &kp SEMICOLON  &trans  &none  &trans  &trans  &trans  &lt 5 SPACE  &trans
             >;
 
             label = "NUM";
@@ -97,7 +97,7 @@
         nav {
             display-name = "SYM";
             bindings = <
-&kp TAB  &kp EXCL  &kp LEFT_BRACKET  &kp GRAVE  &kp RIGHT_BRACKET  &kp AT_SIGN  &kp CARET  &kp ESCAPE  &kp UP_ARROW  &kp CAPS  &kp PG_UP  &kp HOME  &kp LCTRL  &kp HASH  &hm LCTRL LEFT_PARENTHESIS  &hm LEFT_ALT SQT  &hm LSHIFT RIGHT_PARENTHESIS  &kp AMPERSAND  &kp MINUS  &kp LEFT_ARROW  &kp DOWN  &kp RIGHT  &kp PAGE_DOWN  &kp END  &kp LSHFT  &kp NON_US_BACKSLASH  &kp LEFT_BRACE  &kp DOUBLE_QUOTES  &kp RIGHT_BRACE  &kp PIPE  &kp UNDER  &kp PLUS  &none  &none  &none  &none  &trans  &lt 7 BACKSPACE  &trans  &trans  &trans  &none
+&kp TAB  &kp EXCL  &kp LEFT_BRACKET  &kp GRAVE  &kp RIGHT_BRACKET  &kp AT_SIGN  &kp CARET  &kp ESCAPE  &kp UP_ARROW  &kp CAPS  &kp PG_UP  &kp HOME  &kp LCTRL  &kp HASH  &hm LCTRL LEFT_PARENTHESIS  &hm LEFT_ALT SQT  &hm LSHIFT RIGHT_PARENTHESIS  &kp AMPERSAND  &kp MINUS  &kp LEFT_ARROW  &kp DOWN  &kp RIGHT  &kp PAGE_DOWN  &kp END  &kp LSHFT  &kp NON_US_BACKSLASH  &kp LEFT_BRACE  &kp DOUBLE_QUOTES  &kp RIGHT_BRACE  &kp PIPE  &kp UNDER  &kp PLUS  &none  &none  &none  &none  &trans  &lt 5 BACKSPACE  &trans  &trans  &trans  &none
             >;
 
             label = "NAV";
