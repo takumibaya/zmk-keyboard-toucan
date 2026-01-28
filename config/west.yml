@@ -5,13 +5,11 @@ manifest:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
     - name: petejohanson
-      url-base: https://github.com/petejohanson/
+      url-base: https://github.com/petejohanson
     - name: caksoylar
       url-base: https://github.com/caksoylar
     - name: geeksville
       url-base: https://github.com/geeksville
-    - name: halfdane
-      url-base: https://github.com/halfdane
   projects:
     - name: zmk
       remote: zmkfirmware
@@ -23,7 +21,7 @@ manifest:
       remote: caksoylar
       revision: main
     - name: zmk-input-gestures
-      remote: halfdane
+      url: https://github.com/takumibaya/zmk-input-gestures
       revision: main
   self:
     path: config
