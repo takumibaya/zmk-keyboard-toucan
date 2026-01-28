@@ -1,4 +1,5 @@
 #include <input/processors.dtsi>
+#include <behaviors/input_processor_gestures.dtsi>
 #include <dt-bindings/zmk/input_transform.h>
 #include <dt-bindings/zmk/matrix_transform.h>
 #include <dt-bindings/input/input-event-codes.h>
@@ -119,7 +120,7 @@
         compatible = "zmk,input-listener";
         status = "okay";
         device = <&glidepoint_split>;
-        input-processors = <&zip_xy_scaler 1 4>, <&touch_processor>;
+        input-processors = <&zip_gestures>, <&zip_xy_scaler 1 4>, <&touch_processor>;
         scroller {
             layers = <1 2>;
             input-processors = <
@@ -129,4 +130,10 @@
             >;
         };
     };
+};
+
+&zip_gestures {
+    inertial-cursor;
+    inertial-cursor-velocity-threshold-ms = <20>;
+    inertial-cursor-decay-percent = <95>;
 };
