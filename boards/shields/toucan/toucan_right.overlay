@@ -83,17 +83,3 @@
 
 #include <behaviors/input_processor_gestures.dtsi>
 
-&zip_gestures {
-    inertial-cursor;
-    inertial-cursor-velocity-threshold = <2>;
-    inertial-cursor-decay-percent = <20>;
-
-	// タップ検出
-    tap-detection;
-    tap-timout-ms = <120>;  // 120ms以内のタッチをタップ（クリック）とみなす
-    // prevent_movement_during_tap;  // オプション：タップ判定中の移動を無視
-};
-
-&glidepoint_listener {
-    input-processors = <&zip_gestures>, <&zip_xy_scaler 1 1>, <&touch_processor>;
-};
