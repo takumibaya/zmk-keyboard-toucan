@@ -115,6 +115,14 @@
         };
     };
 
+    &zip_gestures {
+        inertial-cursor;
+        inertial-cursor-velocity-threshold = <2>;
+        inertial-cursor-decay-percent = <20>;
+        tap-detection;
+        tap-timout-ms = <120>;
+    };
+
     glidepoint_listener: glidepoint_listener {
         compatible = "zmk,input-listener";
         status = "okay";
