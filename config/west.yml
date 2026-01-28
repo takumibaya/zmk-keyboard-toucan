@@ -5,7 +5,7 @@ manifest:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
     - name: petejohanson
-      url-base: https://github.com/petejohanson
+      url-base: https://github.com/petejohanson/
     - name: caksoylar
       url-base: https://github.com/caksoylar
     - name: geeksville
@@ -19,9 +19,6 @@ manifest:
       revision: toucan
     - name: zmk-rgbled-widget
       remote: caksoylar
-      revision: main
-    - name: zmk-input-gestures
-      url: https://github.com/takumibaya/zmk-input-gestures
       revision: main
   self:
     path: config
