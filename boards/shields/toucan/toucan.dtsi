@@ -137,9 +137,12 @@
 
 &zip_gestures {
     inertial-cursor;
-    tap-detection;
-    tap-timout-ms = <120>;
     
-    inertial-cursor-velocity-threshold = <20>;
-    inertial-cursor-decay-percent = <37>;
+    circular-scroll;
+    circular-scroll-rim-percent = <15>;
+    circular-scroll-width = <1024>;
+    circular-scroll-height = <1024>;
+    
+    inertial-cursor-velocity-threshold = <23>;
+    inertial-cursor-decay-percent = <30>;
 };
