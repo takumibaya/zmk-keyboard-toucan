@@ -124,4 +124,8 @@
     inertial-cursor;
     tap-detection;
     tap-timout-ms = <120>;
+
+    // 慣性カーソル調整
+    inertial-cursor-velocity-threshold = <20>;  // 発動閾値（低いほど発動しやすい）
+    inertial-cursor-decay-percent = <85>;       // 減衰率（小さいほど長く滑る）
 };
