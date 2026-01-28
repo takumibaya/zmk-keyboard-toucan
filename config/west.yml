@@ -23,7 +23,7 @@ manifest:
       remote: caksoylar
       revision: main
     - name: zmk-input-gestures
-      remote: halfdane
+      remote: takumibaya
       revision: main
   self:
     path: config
