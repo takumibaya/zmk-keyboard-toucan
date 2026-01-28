@@ -95,5 +95,5 @@
 };
 
 &glidepoint_listener {
-    input-processors = <&zip_gestures>, <&zip_xy_scaler 1 2>, <&touch_processor>;
+    input-processors = <&zip_gestures>, <&zip_xy_scaler 1 1>, <&touch_processor>;
 };
