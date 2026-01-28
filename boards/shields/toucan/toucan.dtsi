@@ -2,7 +2,6 @@
 #include <dt-bindings/zmk/input_transform.h>
 #include <dt-bindings/zmk/matrix_transform.h>
 #include <physical_layouts.dtsi>
-#include <behaviors/input_processor_gestures.dtsi>
 
 
 / {
@@ -106,7 +105,7 @@
 
     glidepoint_listener: glidepoint_listener {
         compatible = "zmk,input-listener";
-        status = "okay";
+        status = "disabled";
         device = <&glidepoint_split>;
         input-processors = <&zip_xy_scaler 250 100>;
         scroller {
@@ -118,10 +117,4 @@
             >;
         };
     };
-};
-
-&zip_gestures {
-    inertial-cursor;
-    tap-detection;
-    tap-timout-ms = <120>;
 };
