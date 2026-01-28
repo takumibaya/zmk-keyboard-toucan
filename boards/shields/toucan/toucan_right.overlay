@@ -80,3 +80,15 @@
     // Optional
     // input-processors = <&zip_xy_transform (INPUT_TRANSFORM_XY_SWAP | INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>;
 };
+
+#include <behaviors/input_processor_gestures.dtsi>
+
+&zip_gestures {
+    inertial-cursor;
+    inertial-cursor-velocity-threshold = <2>;
+    inertial-cursor-decay-percent = <20>;
+};
+
+&glidepoint_listener {
+    input-processors = <&zip_gestures>, <&zip_xy_scaler 1 4>, <&touch_processor>;
+};
