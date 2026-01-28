@@ -96,10 +96,10 @@
 / {
     behaviors {
         touch_processor: touch_processor {
-            compatible = "zmk,input-processor-touch-toggle";
+            compatible = "zmk,input-processor-behaviors";
             #input-processor-cells = <0>;
-            toggle-mode = <1>;
-            bindings = <&mo 4>;  // Activate layer 4 (mouse) when touching trackpad
+            bindings = <&mo 4>;
+            codes = <INPUT_BTN_TOUCH>;
         };
     };
 };
@@ -112,7 +112,6 @@
         glidepoint_split: glidepoint_split@0 {
             compatible = "zmk,input-split";
             reg = <0>;
-            input-processors = <&scaler 1 1>, <&touch_processor>;
         };
     };
 
@@ -121,6 +120,10 @@
         status = "okay";
         device = <&glidepoint_split>;
         input-processors = <&zip_xy_scaler 250 100>;
+        base {
+            layers = <0>;
+            input-processors = <&touch_processor>;
+        };
         scroller {
             layers = <1 2>;
             input-processors = <
