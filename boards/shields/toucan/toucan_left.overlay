@@ -26,13 +26,6 @@ nice_view_spi: &spi0 {
    pinctrl-1 = <&spi0_sleep>;
    pinctrl-names = "default", "sleep";
    cs-gpios = <&gpio0 3 GPIO_ACTIVE_HIGH>;
-   
-   glidepoint: glidepoint@0 {
-        compatible = "cirque,pinnacle";
-        reg = <0>;
-        status = "disabled";
-        spi-max-frequency = <1000000>;
-    };
 };
 
 &xiao_i2c {
