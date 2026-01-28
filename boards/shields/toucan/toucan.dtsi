@@ -119,11 +119,7 @@
         compatible = "zmk,input-listener";
         status = "okay";
         device = <&glidepoint_split>;
-        input-processors = <&zip_xy_scaler 250 100>;
-        base {
-            layers = <0>;
-            input-processors = <&touch_processor>;
-        };
+        input-processors = <&zip_xy_scaler 1 4>, <&touch_processor>;
         scroller {
             layers = <1 2>;
             input-processors = <
