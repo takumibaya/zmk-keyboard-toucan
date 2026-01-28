@@ -97,7 +97,7 @@
         nav {
             display-name = "SYM";
             bindings = <
-&kp TAB  &kp EXCL  &kp LEFT_BRACKET  &kp GRAVE  &kp RIGHT_BRACKET  &kp AT_SIGN  &kp CARET  &kp ESCAPE  &kp UP_ARROW  &kp CAPS  &kp PG_UP  &kp HOME  &kp LCTRL  &kp HASH  &hm LCTRL LEFT_PARENTHESIS  &hm LEFT_ALT SQT  &hm LSHIFT RIGHT_PARENTHESIS  &kp AMPERSAND  &kp MINUS  &kp LEFT_ARROW  &kp DOWN  &kp RIGHT  &kp PAGE_DOWN  &kp END  &kp LSHFT  &kp NON_US_BACKSLASH  &kp LEFT_BRACE  &kp DOUBLE_QUOTES  &kp RIGHT_BRACE  &kp PIPE  &kp UNDER  &kp PLUS  &none  &none  &none  &none  &trans  &lt 5 BACKSPACE  &trans  &trans  &trans  &none
+&kp TAB  &kp EXCL  &kp LEFT_BRACKET  &kp GRAVE  &kp RIGHT_BRACKET  &kp AT_SIGN  &kp LG(EQUAL)  &kp ESCAPE  &kp UP_ARROW  &kp CAPS  &kp PG_UP  &kp HOME  &kp LCTRL  &kp HASH  &hm LCTRL LEFT_PARENTHESIS  &hm LEFT_ALT SQT  &hm LSHIFT RIGHT_PARENTHESIS  &kp AMPERSAND  &kp LG(MINUS)  &kp LEFT_ARROW  &kp DOWN  &kp RIGHT  &kp PAGE_DOWN  &kp END  &kp LSHFT  &kp NON_US_BACKSLASH  &kp LEFT_BRACE  &kp DOUBLE_QUOTES  &kp RIGHT_BRACE  &kp PIPE  &kp UNDER  &kp PLUS  &none  &none  &none  &none  &trans  &lt 5 BACKSPACE  &trans  &trans  &trans  &none
             >;
 
             label = "NAV";
@@ -105,7 +105,7 @@
 
         ctrl {
             bindings = <
-&trans  &trans  &kp LG(LEFT_BRACKET)  &trans  &kp LG(RIGHT_BRACKET)  &msc MOVE_Y(-20)  &msc MOVE_Y(-20)  &kp LG(LEFT_BRACKET)  &mmv MOVE_UP  &kp LG(RIGHT_BRACKET)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(20)  &msc MOVE_Y(20)  &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_RIGHT  &trans  &trans  &trans  &trans  &msc MOVE_X(-20)  &trans  &msc MOVE_X(20)  &mkp MCLK  &mkp MCLK  &msc MOVE_X(-20)  &none  &msc MOVE_X(20)  &trans  &trans  &none  &mkp RCLK  &mkp LCLK  &mkp LCLK  &mkp RCLK  &tog 0
+&trans  &trans  &kp LG(LEFT_BRACKET)  &trans  &kp LG(RIGHT_BRACKET)  &msc MOVE_Y(-20)  &msc MOVE_Y(-20)  &kp LG(LEFT_BRACKET)  &mmv MOVE_UP  &kp LG(RIGHT_BRACKET)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(20)  &msc MOVE_Y(20)  &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_RIGHT  &trans  &trans  &trans  &trans  &msc MOVE_X(-20)  &kp LEFT_GUI  &msc MOVE_X(20)  &mkp MCLK  &mkp MCLK  &msc MOVE_X(-20)  &none  &msc MOVE_X(20)  &trans  &trans  &none  &mkp RCLK  &mkp LCLK  &mkp LCLK  &mkp RCLK  &tog 0
             >;
 
             label = "Ctrl";
