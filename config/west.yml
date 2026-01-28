@@ -10,6 +10,8 @@ manifest:
       url-base: https://github.com/caksoylar
     - name: geeksville
       url-base: https://github.com/geeksville
+    - name: badjeff
+      url-base: https://github.com/badjeff
   projects:
     - name: zmk
       remote: zmkfirmware
@@ -19,6 +21,9 @@ manifest:
       revision: toucan
     - name: zmk-rgbled-widget
       remote: caksoylar
+      revision: main
+    - name: zmk-input-gestures
+      remote: badjeff
       revision: main
   self:
     path: config
