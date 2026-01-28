@@ -1,6 +1,7 @@
 #include <input/processors.dtsi>
 #include <dt-bindings/zmk/input_transform.h>
 #include <dt-bindings/zmk/matrix_transform.h>
+#include <dt-bindings/input/input-event-codes.h>
 #include <physical_layouts.dtsi>
 
 
@@ -95,9 +96,9 @@
 / {
     behaviors {
         touch_processor: touch_processor {
-            compatible = "zmk,input-processor-behavior";
+            compatible = "zmk,input-processor-touch-toggle";
             #input-processor-cells = <0>;
-            codes = <INPUT_BTN_TOUCH>;
+            toggle-mode = <1>;
             bindings = <&mo 4>;  // Activate layer 4 (mouse) when touching trackpad
         };
     };
