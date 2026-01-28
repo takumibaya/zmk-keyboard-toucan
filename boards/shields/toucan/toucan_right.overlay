@@ -85,8 +85,8 @@
 
 &zip_gestures {
     inertial-cursor;
-    inertial-cursor-velocity-threshold = <1>;
-    inertial-cursor-decay-percent = <5>;
+    inertial-cursor-velocity-threshold = <2>;
+    inertial-cursor-decay-percent = <20>;
 
 	// タップ検出
     tap-detection;
@@ -95,5 +95,5 @@
 };
 
 &glidepoint_listener {
-    input-processors = <&zip_gestures>, <&zip_xy_scaler 1 4>, <&touch_processor>;
+    input-processors = <&zip_gestures>, <&zip_xy_scaler 1 2>, <&touch_processor>;
 };
