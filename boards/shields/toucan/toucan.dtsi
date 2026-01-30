@@ -138,7 +138,7 @@
 &zip_gestures {
     tap-detection;
     tap-timout-ms = <120>;
-    prevent-movement-during-tap;
+    prevent_movement_during_tap;
 
     inertial-cursor;
 
