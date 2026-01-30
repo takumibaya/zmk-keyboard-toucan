@@ -136,13 +136,17 @@
 };
 
 &zip_gestures {
+    tap-detection;
+    tap-timeout-ms = <120>;
+    prevent-movement-during-tap;
+
     inertial-cursor;
-    
+
     circular-scroll;
     circular-scroll-rim-percent = <20>;
     circular-scroll-width = <1024>;
     circular-scroll-height = <1024>;
-    
+
     inertial-cursor-velocity-threshold = <23>;
     inertial-cursor-decay-percent = <20>;
 };
