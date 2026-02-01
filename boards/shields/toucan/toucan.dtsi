@@ -137,8 +137,8 @@
 
 &zip_gestures {
     tap-detection;
-    tap-timout-ms = <120>;
-    prevent_movement_during_tap;
+    tap-timout-ms = <200>;
+    // prevent_movement_during_tap;  // 一時的に無効化してテスト
 
     inertial-cursor;
 
