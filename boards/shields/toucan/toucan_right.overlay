@@ -63,9 +63,6 @@
         status = "okay";
         dr-gpios = <&gpio0 2 (GPIO_ACTIVE_HIGH)>;
         sensitivity = "3x";
-        absolute-mode;
-        absolute-mode-scale-to-width = <1024>;
-        absolute-mode-scale-to-height = <1024>;
         abs-rel-divisor = <1>;
         x-invert;
 		y-invert;
