@@ -120,8 +120,8 @@
         };
 
         base {
-        layers = <0>;
-        input-processors = <&touch_processor>;
+            layers = <0>;
+            input-processors = <&zip_gestures>, <&touch_processor>;
         };
     };
     input_processors {
