@@ -3,7 +3,6 @@
 #include <dt-bindings/zmk/matrix_transform.h>
 #include <physical_layouts.dtsi>
 #include <behaviors/input_processor_gestures.dtsi>
-#include <behaviors/input_processor_absolute_to_relative.dtsi>
 #include <dt-bindings/input/input-event-codes.h>
 
 
@@ -110,7 +109,7 @@
         compatible = "zmk,input-listener";
         status = "disabled";
         device = <&glidepoint_split>;
-        input-processors = <&zip_gestures>, <&zip_absolute_to_relative>, <&zip_xy_scaler 1 1>; 
+        input-processors = <&zip_gestures>, <&zip_xy_scaler 1 1>; 
         scroller {
             layers = <1 2>;
             input-processors = <
@@ -122,7 +121,7 @@
 
         base {
             layers = <0>;
-            input-processors = <&zip_gestures>, <&zip_absolute_to_relative>, <&touch_processor>;
+            input-processors = <&zip_gestures>, <&touch_processor>;
         };
     };
     input_processors {
