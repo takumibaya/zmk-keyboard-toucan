@@ -10,6 +10,11 @@
 #define MOUSE 4
 #define ADJ   5
 
+// quick-tap-ms: 二度押し時にタップキーが連続入力される設定
+&lt {
+    quick-tap-ms = <200>;
+};
+
 / {
     behaviors {
         hm: homerow_mods {
