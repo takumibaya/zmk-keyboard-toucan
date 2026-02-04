@@ -139,13 +139,6 @@
     // tap-detection disabled: use Cirque hardware tap instead (works better with split keyboards)
 
     inertial-cursor;
-
-    // circular-scroll disabled to test trackpad freezing issue
-    // circular-scroll;
-    // circular-scroll-rim-percent = <20>;
-    // circular-scroll-width = <1024>;
-    // circular-scroll-height = <1024>;
-
     inertial-cursor-velocity-threshold = <23>;
     inertial-cursor-decay-percent = <20>;
 };
