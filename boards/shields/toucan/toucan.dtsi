@@ -146,4 +146,5 @@
 
 &pointer_accel {
     input-type = <INPUT_EV_REL>;
+    codes = <INPUT_REL_X INPUT_REL_Y>;
 };
