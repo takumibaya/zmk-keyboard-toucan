@@ -68,6 +68,11 @@
             bindings = <&to 1>;
             key-positions = <23 11>;
         };
+
+        combo-delete {
+            bindings = <&kp DELETE>;
+            key-positions = <37 39>;
+        };
     };
 
     keymap {
