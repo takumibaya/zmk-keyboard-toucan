@@ -139,6 +139,7 @@
     // tap-detection disabled: use Cirque hardware tap instead (works better with split keyboards)
 
     inertial-cursor;
+
     inertial-cursor-velocity-threshold = <23>;
     inertial-cursor-decay-percent = <20>;
 };
