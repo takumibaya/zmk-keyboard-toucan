@@ -121,7 +121,7 @@
 
         base {
             layers = <0>;
-            input-processors = <&zip_gestures>, <&touch_processor>;
+            input-processors = <&touch_processor>;
         };
     };
     input_processors {
