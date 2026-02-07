@@ -1,4 +1,4 @@
-#include <input/processors.dtsi>
+    #include <input/processors.dtsi>
 #include <dt-bindings/zmk/input_transform.h>
 #include <dt-bindings/zmk/matrix_transform.h>
 #include <physical_layouts.dtsi>
@@ -153,10 +153,10 @@
     input-type = <INPUT_EV_REL>;
     codes = <INPUT_REL_X INPUT_REL_Y>;
 
-    sensitivity           = <850>;   // 1.0x 標準感度
-    min-factor            = <700>;    // 0.85x：低速は少し減速（精密操作）
+    sensitivity           = <800>;   // 1.0x 標準感度
+    min-factor            = <650>;    // 0.85x：低速は少し減速（精密操作）
     max-factor            = <5000>;   // 3.0x：高速は控えめ（Macらしい自然さ）
-    speed-threshold       = <700>;    // 早めに加速開始（反応の良さ）
+    speed-threshold       = <800>;    // 早めに加速開始（反応の良さ）
     speed-max             = <3000>;   // 中〜高速でmax到達
     y-boost               = <1100>;   // 1.05x：縦を僅かにブースト
     acceleration-exponent = <2>;      // 二次関数（滑らかで自然）
