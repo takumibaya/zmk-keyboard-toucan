@@ -110,7 +110,13 @@
         compatible = "zmk,input-listener";
         status = "disabled";
         device = <&glidepoint_split>;
-        input-processors = <&zip_gestures>, <&pointer_accel>, <&zip_xy_scaler 3 4>;
+        input-processors = <
+            &touch_processor
+            &click_reset
+            &zip_gestures
+            &pointer_accel
+            &zip_xy_scaler 3 4
+        >;
         scroller {
             layers = <1 2>;
             input-processors = <
