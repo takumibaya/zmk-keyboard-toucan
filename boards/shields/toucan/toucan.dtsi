@@ -173,13 +173,12 @@
     input-type = <INPUT_EV_REL>;
     codes = <INPUT_REL_X INPUT_REL_Y>;
 
-    sensitivity           = <700>;   // 1.0x 標準感度
+    sensitivity           = <500>;   // 1.0x 標準感度
     min-factor            = <400>;    // 0.85x：低速は少し減速（精密操作）
     max-factor            = <6000>;   // 3.0x：高速は控えめ（Macらしい自然さ）
     speed-threshold       = <2000>;    // 早めに加速開始（反応の良さ）
     speed-max             = <3000>;   // 中〜高速でmax到達
-    y-boost               = <1300>;   // 1.05x：縦を僅かにブースト
-    x-boost               = <700>;   // 1.05x：縦を僅かにブースト
+    y-boost               = <1500>;   // 1.05x：縦を僅かにブースト
     acceleration-exponent = <2>;      // 二次関数（滑らかで自然）
     sensor-dpi            = <400>;
     track-remainders;
