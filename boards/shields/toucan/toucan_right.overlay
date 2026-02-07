@@ -57,21 +57,17 @@
    pinctrl-names = "default", "sleep";
    cs-gpios = <&gpio0 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;  // pull-up to ensure CS is !asserted when asleep
    glidepoint:  glidepoint@0 {
-	    compatible = "cirque,pinnacle";
-	    reg = <0>;
-	    spi-max-frequency = <1000000>;
-	    status = "okay";
-	    dr-gpios = <&gpio0 2 (GPIO_ACTIVE_HIGH)>;
-	    sensitivity = "3x";
-	    data-mode = "relative";
-	    idle-packets-count = <5>;  // 軽いタップ検出用に 5 パケット程度（任意調整）
-	
-	    primary-tap-enable;        // ← これでタップ＝左クリックを有効化
-	
-	    y-invert;                  // 旧: y-invert;
-	    // sleep-mode-enable;      // 強い省電力を使うなら有効に
-	};
-
+        compatible = "cirque,pinnacle";
+        reg = <0>;
+        spi-max-frequency = <1000000>;
+        status = "okay";
+        dr-gpios = <&gpio0 2 (GPIO_ACTIVE_HIGH)>;
+        sensitivity = "3x";
+        abs-rel-divisor = <1>;
+        x-invert;
+        y-invert;
+        //sleep;
+    };
 };
 
 &glidepoint_split {
