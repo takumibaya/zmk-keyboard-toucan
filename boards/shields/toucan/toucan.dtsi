@@ -159,8 +159,8 @@
     speed-threshold       = <700>;    // 早めに加速開始（反応の良さ）
     speed-max             = <4000>;   // 中〜高速でmax到達
     y-boost               = <1100>;   // 1.05x：縦を僅かにブースト
-    acceleration-exponent = <3>;      // 二次関数（滑らかで自然）
-    sensor-dpi            = <1200>;
+    acceleration-exponent = <2>;      // 二次関数（滑らかで自然）
+    sensor-dpi            = <600>;
     track-remainders;
 };
 
