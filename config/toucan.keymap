@@ -74,7 +74,7 @@
 
         base {
             bindings = <
-&trans  &kp Q  &kp L  &kp U  &kp COMMA  &kp PERIOD  &kp F  &kp W  &kp R  &kp Y  &kp P  &trans  &trans  &kp E  &hm LCTRL I  &hm LEFT_ALT A  &hm LEFT_SHIFT O  &kp MINUS  &kp K  &hm LS(RSHIFT) T  &hm RIGHT_ALT N  &hm RCTRL S  &kp H  &mo 6  &trans  &kp Z  &kp X  &kp C  &kp V  &kp SEMICOLON  &kp G  &kp D  &kp M  &kp J  &kp B  &trans  &mo 4  &lt 2 BACKSPACE  &hm LEFT_COMMAND SPACE  &hm RIGHT_COMMAND ENTER  &lt 3 TAB  &tog 4
+&trans  &kp Q  &kp L  &kp U  &kp COMMA  &kp PERIOD  &kp F  &kp W  &kp R  &kp Y  &kp P  &trans  &trans  &kp E  &hm LCTRL I  &hm LEFT_ALT A  &hm LEFT_SHIFT O  &kp MINUS  &kp K  &hm LS(RSHIFT) T  &hm RIGHT_ALT N  &hm RCTRL S  &kp H  &mo 7  &trans  &kp Z  &kp X  &kp C  &kp V  &kp SEMICOLON  &kp G  &kp D  &kp M  &kp J  &kp B  &trans  &mo 5  &lt 2 BACKSPACE  &hm LEFT_COMMAND SPACE  &hm RIGHT_COMMAND ENTER  &lt 3 TAB  &tog 5
             >;
 
             label = "BASE";
@@ -83,7 +83,7 @@
         qwert {
             display-name = "QWERT";
             bindings = <
-&kp TAB  &kp Q  &kp W  &kp E  &kp R  &kp T  &kp Y  &kp U  &kp I  &kp O  &kp P  &kp BSPC  &kp LCTRL  &kp A  &hm LCTRL S  &hm LALT D  &hm LSHIFT F  &kp G  &kp H  &hm RSHIFT J  &hm RALT K  &hm RCTRL L  &kp SEMI  &kp SQT  &kp LSHFT  &kp Z  &kp X  &kp C  &kp V  &kp B  &kp N  &kp M  &kp COMMA  &kp DOT  &kp FSLH  &kp ESC  &mo 4  &lt 2 BACKSPACE  &hm LEFT_COMMAND SPACE  &hm RIGHT_COMMAND ENTER  &lt 3 TAB  &mkp LCLK
+&kp TAB  &kp Q  &kp W  &kp E  &kp R  &kp T  &kp Y  &kp U  &kp I  &kp O  &kp P  &kp BSPC  &kp LCTRL  &kp A  &hm LCTRL S  &hm LALT D  &hm LSHIFT F  &kp G  &kp H  &hm RSHIFT J  &hm RALT K  &hm RCTRL L  &kp SEMI  &kp SQT  &kp LSHFT  &kp Z  &kp X  &kp C  &kp V  &kp B  &kp N  &kp M  &kp COMMA  &kp DOT  &kp FSLH  &kp ESC  &mo 5  &lt 2 BACKSPACE  &hm LEFT_COMMAND SPACE  &hm RIGHT_COMMAND ENTER  &lt 3 TAB  &mkp LCLK
             >;
 
             label = "QWERT";
@@ -92,7 +92,7 @@
         num {
             display-name = "NUM";
             bindings = <
-&kp ESCAPE  &trans  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp PERIOD  &kp CARET  &kp LESS_THAN  &kp EQUAL  &kp GREATER_THAN  &trans  &trans  &kp LCTRL  &kp NUMBER_0  &hm LCTRL NUMBER_4  &hm LALT NUMBER_5  &hm LSHIFT NUMBER_6  &kp TILDE  &kp PERCENT  &hm RSHIFT PLUS  &hm RALT MINUS  &hm RCTRL ASTERISK  &kp SLASH  &trans  &trans  &kp DOLLAR  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp COMMA  &kp UNDERSCORE  &kp EXCLAMATION  &kp QUESTION  &kp COLON  &kp SEMICOLON  &trans  &none  &trans  &trans  &trans  &lt 5 SPACE  &trans
+&kp ESCAPE  &trans  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp PERIOD  &kp CARET  &kp LESS_THAN  &kp EQUAL  &kp GREATER_THAN  &trans  &trans  &kp LCTRL  &kp NUMBER_0  &hm LCTRL NUMBER_4  &hm LALT NUMBER_5  &hm LSHIFT NUMBER_6  &kp TILDE  &kp PERCENT  &hm RSHIFT PLUS  &hm RALT MINUS  &hm RCTRL ASTERISK  &kp SLASH  &trans  &trans  &kp DOLLAR  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp COMMA  &kp UNDERSCORE  &kp EXCLAMATION  &kp QUESTION  &kp COLON  &kp SEMICOLON  &trans  &none  &trans  &trans  &trans  &lt 6 SPACE  &trans
             >;
 
             label = "NUM";
@@ -101,10 +101,17 @@
         nav {
             display-name = "NAV";
             bindings = <
-&kp TAB  &kp EXCL  &kp LEFT_BRACKET  &kp GRAVE  &kp RIGHT_BRACKET  &kp AT_SIGN  &kp LG(EQUAL)  &kp ESCAPE  &kp UP_ARROW  &kp CAPS  &kp PG_UP  &kp HOME  &kp LCTRL  &kp HASH  &hm LCTRL LEFT_PARENTHESIS  &hm LEFT_ALT SQT  &hm LSHIFT RIGHT_PARENTHESIS  &kp AMPERSAND  &kp LG(MINUS)  &kp LEFT_ARROW  &kp DOWN  &kp RIGHT  &kp PAGE_DOWN  &kp END  &kp LSHFT  &kp NON_US_BACKSLASH  &kp LEFT_BRACE  &kp DOUBLE_QUOTES  &kp RIGHT_BRACE  &kp PIPE  &kp UNDER  &kp PLUS  &kp GLOBE  &none  &none  &none  &trans  &lt 5 DELETE  &trans  &trans  &trans  &none
+&kp TAB  &kp EXCL  &kp LEFT_BRACKET  &kp GRAVE  &kp RIGHT_BRACKET  &kp AT_SIGN  &kp LG(EQUAL)  &kp ESCAPE  &kp UP_ARROW  &kp CAPS  &kp PG_UP  &kp HOME  &kp LCTRL  &kp HASH  &hm LCTRL LEFT_PARENTHESIS  &hm LEFT_ALT SQT  &hm LSHIFT RIGHT_PARENTHESIS  &kp AMPERSAND  &kp LG(MINUS)  &kp LEFT_ARROW  &kp DOWN  &kp RIGHT  &kp PAGE_DOWN  &kp END  &kp LSHFT  &kp NON_US_BACKSLASH  &kp LEFT_BRACE  &kp DOUBLE_QUOTES  &kp RIGHT_BRACE  &kp PIPE  &kp UNDER  &kp PLUS  &kp GLOBE  &none  &none  &none  &trans  &lt 6 DELETE  &trans  &trans  &trans  &none
             >;
 
             label = "NAV";
+        };
+
+        layer_10 {
+            label = "Ctrl";
+            bindings = <
+&trans  &trans  &kp LG(LEFT_BRACKET)  &kp LEFT_GUI  &kp LG(RIGHT_BRACKET)  &msc MOVE_Y(20)  &mkp RCLK  &msc MOVE_Y(20)  &mmv MOVE_Y(-1200)  &kp LG(RIGHT_BRACKET)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-20)  &mkp LCLK  &msc MOVE_Y(-20)  &mmv MOVE_Y(1200)  &mmv MOVE_X(1200)  &trans  &trans  &trans  &trans  &msc MOVE_X(-15)  &kp LEFT_GUI  &msc MOVE_X(15)  &mkp MCLK  &msc MOVE_X(-15)  &msc MOVE_X(15)  &mkp MCLK  &msc MOVE_X(15)  &trans  &trans  &none  &mkp RCLK  &mkp LCLK  &mkp LCLK  &mkp RCLK  &tog 0
+            >;
         };
 
         ctrl {
