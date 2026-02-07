@@ -115,7 +115,7 @@
 
         ctrl {
             bindings = <
-&trans  &trans  &kp LG(LEFT_BRACKET)  &trans  &kp LG(RIGHT_BRACKET)  &msc MOVE_Y(-20)  &msc MOVE_Y(-20)  &kp LG(LEFT_BRACKET)  &mmv MOVE_Y(-1200)  &kp LG(RIGHT_BRACKET)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(20)  &msc MOVE_Y(20)  &mmv MOVE_X(-1200)  &mmv MOVE_Y(1200)  &mmv MOVE_X(1200)  &trans  &trans  &trans  &trans  &msc MOVE_X(20)  &kp LEFT_GUI  &msc MOVE_X(-20)  &mkp MCLK  &mkp MCLK  &msc MOVE_X(20)  &none  &msc MOVE_X(-20)  &trans  &trans  &none  &mkp RCLK  &mkp LCLK  &mkp LCLK  &mkp RCLK  &tog 0
+&trans  &trans  &kp LG(LEFT_BRACKET)  &trans  &kp LG(RIGHT_BRACKET)  &msc MOVE_Y(20)  &msc MOVE_Y(20)  &kp LG(LEFT_BRACKET)  &mmv MOVE_Y(-1200)  &kp LG(RIGHT_BRACKET)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y-(20)  &msc MOVE_Y(-20)  &mmv MOVE_X(-1200)  &mmv MOVE_Y(1200)  &mmv MOVE_X(1200)  &trans  &trans  &trans  &trans  &msc MOVE_X(20)  &kp LEFT_GUI  &msc MOVE_X(-20)  &mkp MCLK  &mkp MCLK  &msc MOVE_X(20)  &none  &msc MOVE_X(-20)  &trans  &trans  &none  &mkp RCLK  &mkp LCLK  &mkp LCLK  &mkp RCLK  &tog 0
             >;
 
             label = "Ctrl";
