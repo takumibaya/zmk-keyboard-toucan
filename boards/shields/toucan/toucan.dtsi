@@ -153,16 +153,14 @@
     input-type = <INPUT_EV_REL>;
     codes = <INPUT_REL_X INPUT_REL_Y>;
 
-    /* 低速はしっかり重め、高速はガッと伸ばす設定 */
-
-    sensitivity           = <1000>;    // 0.9x 基本感度（全体少し重め）
-    min-factor            = <200>;    // 0.7x：低速はさらに減速して精密に
-    max-factor            = <1300>;   // 4.0x：高速はかなり伸ばす
-    speed-threshold       = <1000>;    // ここからアクセル開始（わりと低め）
-    speed-max             = <3500>;   // ここで 4.0x に到達（中速〜高速で一気に伸びる）
-    y-boost               = <1200>;   // 1.2x：縦は少しだけブースト
-    acceleration-exponent = <3>;      // モデレート指数：自然だけどちゃんと強い
-    sensor-dpi            = <800>;    // Cirque を 800DPI 想定（そのままで OK）
+    sensitivity           = <1000>;   // 1.0x 標準感度
+    min-factor            = <850>;    // 0.85x：低速は少し減速（精密操作）
+    max-factor            = <3000>;   // 3.0x：高速は控えめ（Macらしい自然さ）
+    speed-threshold       = <800>;    // 早めに加速開始（反応の良さ）
+    speed-max             = <5000>;   // 中〜高速でmax到達
+    y-boost               = <1050>;   // 1.05x：縦を僅かにブースト
+    acceleration-exponent = <2>;      // 二次関数（滑らかで自然）
+    sensor-dpi            = <800>;
 };
 
 &zip_gestures {
