@@ -112,7 +112,6 @@
         device = <&glidepoint_split>;
         input-processors = <
             &touch_processor
-            &click_reset
             &zip_gestures
             &pointer_accel
             &zip_xy_scaler 3 4
