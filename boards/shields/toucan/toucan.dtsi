@@ -132,6 +132,19 @@
             codes = <INPUT_BTN_TOUCH>;
             bindings = <&sl 4>;
         };
+
+        click_reset: click_reset {
+            compatible = "zmk,input-processor-behaviors";
+            #input-processor-cells = <0>;
+
+            // mkp 左右・中クリックでベースレイヤーに戻す
+            codes = <
+                INPUT_BTN_LEFT
+                INPUT_BTN_RIGHT
+                INPUT_BTN_MIDDLE
+            >;
+            bindings = <&sl 0>;
+        };
     };
 };
 
