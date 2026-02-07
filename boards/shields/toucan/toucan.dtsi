@@ -125,20 +125,7 @@
             input-processors = <&touch_processor>;
         };
     };
-
-    &pointer_accel {
-        input-type = <INPUT_EV_REL>;
-        codes = <INPUT_REL_X INPUT_REL_Y>;
-
-        // まずは README のレベル1プリセットに乗るなら、ここは最小限でもOK
-        // カスタムするなら、ここに sensitivity などを追加
-        // sensitivity = <1300>;
-        // max-factor = <2800>;
-        // curve-type = <1>;
-        // y-boost = <1200>;
-        // sensor-dpi = <800>;
-    };
-
+    
 
     input_processors {
             touch_processor: touch_processor {
@@ -150,6 +137,19 @@
             };
     };
 };
+
+&pointer_accel {
+        input-type = <INPUT_EV_REL>;
+        codes = <INPUT_REL_X INPUT_REL_Y>;
+
+        // まずは README のレベル1プリセットに乗るなら、ここは最小限でもOK
+        // カスタムするなら、ここに sensitivity などを追加
+        // sensitivity = <1300>;
+        // max-factor = <2800>;
+        // curve-type = <1>;
+        // y-boost = <1200>;
+        // sensor-dpi = <800>;
+    };
 
 &zip_gestures {
     // tap-detection disabled: use Cirque hardware tap instead (works better with split keyboards)
