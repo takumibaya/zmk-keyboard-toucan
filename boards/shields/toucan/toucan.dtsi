@@ -174,8 +174,8 @@
     codes = <INPUT_REL_X INPUT_REL_Y>;
 
     sensitivity           = <800>;   // 1.0x 標準感度
-    min-factor            = <550>;    // 0.85x：低速は少し減速（精密操作）
-    max-factor            = <5000>;   // 3.0x：高速は控えめ（Macらしい自然さ）
+    min-factor            = <400>;    // 0.85x：低速は少し減速（精密操作）
+    max-factor            = <6000>;   // 3.0x：高速は控えめ（Macらしい自然さ）
     speed-threshold       = <1100>;    // 早めに加速開始（反応の良さ）
     speed-max             = <3000>;   // 中〜高速でmax到達
     y-boost               = <1100>;   // 1.05x：縦を僅かにブースト
