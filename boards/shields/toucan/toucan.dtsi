@@ -1,4 +1,4 @@
-#include <input/processors.dtsi>
+kkkkkkk#include <input/processors.dtsi>
 #include <dt-bindings/zmk/input_transform.h>
 #include <dt-bindings/zmk/matrix_transform.h>
 #include <physical_layouts.dtsi>
@@ -178,7 +178,8 @@
     max-factor            = <6000>;   // 3.0x：高速は控えめ（Macらしい自然さ）
     speed-threshold       = <2000>;    // 早めに加速開始（反応の良さ）
     speed-max             = <3000>;   // 中〜高速でmax到達
-    y-boost               = <1100>;   // 1.05x：縦を僅かにブースト
+    y-boost               = <1300>;   // 1.05x：縦を僅かにブースト
+    x-boost               = <700>;   // 1.05x：縦を僅かにブースト
     acceleration-exponent = <2>;      // 二次関数（滑らかで自然）
     sensor-dpi            = <400>;
     track-remainders;
