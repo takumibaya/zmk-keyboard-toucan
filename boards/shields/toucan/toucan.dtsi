@@ -122,7 +122,7 @@
 
         base {
             layers = <0>;
-            input-processors = <&touch_processor>;
+            input-processors = <&touch_processor>, <&click_reset>;
         };
     };
 
@@ -136,6 +136,17 @@
                 bindings = <&sl 4>;
             };
     };
+    click_reset: click_reset {
+            compatible = "zmk,input-processor-behaviors";
+            #input-processor-cells = <0>;
+            codes = <
+                INPUT_BTN_LEFT
+                INPUT_BTN_RIGHT
+                INPUT_BTN_MIDDLE
+            >;
+            bindings = <&sl 0>;        // ベースレイヤーにスティッキーオン＝戻る
+        };
+    };
 };
 
 &pointer_accel {
@@ -144,10 +155,10 @@
 
     /* 低速はしっかり重め、高速はガッと伸ばす設定 */
 
-    sensitivity           = <1000>;    // 0.9x 基本感度（全体少し重め）
-    min-factor            = <800>;    // 0.7x：低速はさらに減速して精密に
-    max-factor            = <1500>;   // 4.0x：高速はかなり伸ばす
-    speed-threshold       = <600>;    // ここからアクセル開始（わりと低め）
+    sensitivity           = <700>;    // 0.9x 基本感度（全体少し重め）
+    min-factor            = <500>;    // 0.7x：低速はさらに減速して精密に
+    max-factor            = <1300>;   // 4.0x：高速はかなり伸ばす
+    speed-threshold       = <1000>;    // ここからアクセル開始（わりと低め）
     speed-max             = <5000>;   // ここで 4.0x に到達（中速〜高速で一気に伸びる）
     y-boost               = <1200>;   // 1.2x：縦は少しだけブースト
     acceleration-exponent = <2>;      // モデレート指数：自然だけどちゃんと強い
