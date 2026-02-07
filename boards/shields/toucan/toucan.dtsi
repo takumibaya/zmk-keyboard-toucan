@@ -153,14 +153,15 @@
     input-type = <INPUT_EV_REL>;
     codes = <INPUT_REL_X INPUT_REL_Y>;
 
-    sensitivity           = <1000>;   // 1.0x 標準感度
+    sensitivity           = <900>;   // 1.0x 標準感度
     min-factor            = <850>;    // 0.85x：低速は少し減速（精密操作）
-    max-factor            = <2500>;   // 3.0x：高速は控えめ（Macらしい自然さ）
-    speed-threshold       = <1000>;    // 早めに加速開始（反応の良さ）
-    speed-max             = <6000>;   // 中〜高速でmax到達
+    max-factor            = <2800>;   // 3.0x：高速は控えめ（Macらしい自然さ）
+    speed-threshold       = <700>;    // 早めに加速開始（反応の良さ）
+    speed-max             = <3500>;   // 中〜高速でmax到達
     y-boost               = <1050>;   // 1.05x：縦を僅かにブースト
     acceleration-exponent = <2>;      // 二次関数（滑らかで自然）
-    sensor-dpi            = <800>;
+    sensor-dpi            = <1200>;
+    track-remainders;
 };
 
 &zip_gestures {
