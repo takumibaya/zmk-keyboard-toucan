@@ -23,5 +23,8 @@ manifest:
     - name: zmk-input-gestures
       url: https://github.com/takumibaya/zmk-input-gestures
       revision: main
+    - name: zmk-pointing-acceleration-alpha
+      remote: nuovotaka
+      revision: main
   self:
     path: config

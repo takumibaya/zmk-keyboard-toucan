@@ -4,6 +4,7 @@
 #include <physical_layouts.dtsi>
 #include <behaviors/input_processor_gestures.dtsi>
 #include <dt-bindings/input/input-event-codes.h>
+#include <behaviors/input_gestures_accel.dtsi>
 
 
 / {
@@ -109,7 +110,7 @@
         compatible = "zmk,input-listener";
         status = "disabled";
         device = <&glidepoint_split>;
-        input-processors = <&zip_gestures>, <&zip_xy_scaler 4 5>; 
+        input-processors = <&zip_gestures>, <&pointer_accel>, <&zip_xy_scaler 4 5>; 
         scroller {
             layers = <1 2>;
             input-processors = <
@@ -124,6 +125,22 @@
             input-processors = <&touch_processor>;
         };
     };
+
+    pointer_accel: pointer_accel {
+        compatible = "zmk,input-processor-gestures-accel";
+        #input-processor-cells = <0>;
+
+        input-type = <INPUT_EV_REL>;
+        codes = <INPUT_REL_X INPUT_REL_Y>;
+
+        // レベル1相当のシンプル設定（あとで数値調整OK）
+        sensitivity = <1200>;   // 1.2x 基本感度
+        max-factor = <2800>;    // 最大 2.8x アクセラレーション
+        curve-type = <1>;       // 0=リニア, 1=マイルド, 2=ストロング
+        y-boost = <1200>;       // 1.2x Y ブースト
+        sensor-dpi = <800>;     // Cirque を 800DPI 想定（必要なら変更）
+    };
+
     input_processors {
             touch_processor: touch_processor {
                 compatible = "zmk,input-processor-behaviors";
