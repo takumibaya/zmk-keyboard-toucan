@@ -1,4 +1,4 @@
-    #include <input/processors.dtsi>
+#include <input/processors.dtsi>
 #include <dt-bindings/zmk/input_transform.h>
 #include <dt-bindings/zmk/matrix_transform.h>
 #include <physical_layouts.dtsi>
@@ -110,7 +110,7 @@
         compatible = "zmk,input-listener";
         status = "disabled";
         device = <&glidepoint_split>;
-        input-processors = <&zip_gestures>, <&pointer_accel_stage1>, <&pointer_accel_stage2>, <&zip_xy_scaler 3 4>;
+        input-processors = <&zip_gestures>, <&pointer_accel_stage1>, <&zip_xy_scaler 3 4>;
         scroller {
             layers = <1 2>;
             input-processors = <
@@ -164,33 +164,18 @@
     };
 };
 
-&pointer_accel_stage1 {{
-    input-type = <INPUT_EV_REL>;
-    codes = <INPUT_REL_X INPUT_REL_Y>;
-
-    sensitivity           = <500>;   // 1.0x 標準感度
-    min-factor            = <350>;    // 0.85x：低速は少し減速（精密操作）
-    max-factor            = <650>;   // 3.0x：高速は控えめ（Macらしい自然さ）
-    speed-threshold       = <200>;    // 早めに加速開始（反応の良さ）
-    speed-max             = <1000>;   // 中〜高速でmax到達
-    y-boost               = <1000>;   // 1.05x：縦を僅かにブースト
-    acceleration-exponent = <2>;      // 二次関数（滑らかで自然）
-    sensor-dpi            = <600>;
-    track-remainders;
-};
-
-&pointer_accel_stage2 {{
+&pointer_accel {{
     input-type = <INPUT_EV_REL>;
     codes = <INPUT_REL_X INPUT_REL_Y>;
 
     sensitivity           = <800>;   // 1.0x 標準感度
-    min-factor            = <650>;    // 0.85x：低速は少し減速（精密操作）
+    min-factor            = <550>;    // 0.85x：低速は少し減速（精密操作）
     max-factor            = <5000>;   // 3.0x：高速は控えめ（Macらしい自然さ）
     speed-threshold       = <1100>;    // 早めに加速開始（反応の良さ）
     speed-max             = <3000>;   // 中〜高速でmax到達
     y-boost               = <1100>;   // 1.05x：縦を僅かにブースト
     acceleration-exponent = <2>;      // 二次関数（滑らかで自然）
-    sensor-dpi            = <600>;
+    sensor-dpi            = <400>;
     track-remainders;
 };
 
