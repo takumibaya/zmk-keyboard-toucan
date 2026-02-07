@@ -122,25 +122,44 @@
 
         base {
             layers = <0>;
-            input-processors = <&touch_processor, &click_reset>;
+            input-processors = <
+                &touch_processor
+                &click_reset_left
+                &click_reset_right
+                &click_reset_middle
+            >;
+
         };
     };
 
     input_processors {
+
         touch_processor: touch_processor {
             compatible = "zmk,input-processor-behaviors";
             #input-processor-cells = <0>;
             codes = <INPUT_BTN_TOUCH>;
             bindings = <&sl 4>;
         };
-
-        click_reset: click_reset {
+    
+        click_reset_left: click_reset_left {
             compatible = "zmk,input-processor-behaviors";
             #input-processor-cells = <0>;
-
-            // mkp 左右・中クリックでベースレイヤーに戻す
-            codes = <INPUT_BTN_LEFT INPUT_BTN_RIGHT INPUT_BTN_MIDDLE>;
-            bindings = <&sl 0 &sl 0 &sl 0>;
+            codes = <INPUT_BTN_LEFT>;
+            bindings = <&sl 0>;
+        };
+    
+        click_reset_right: click_reset_right {
+            compatible = "zmk,input-processor-behaviors";
+            #input-processor-cells = <0>;
+            codes = <INPUT_BTN_RIGHT>;
+            bindings = <&sl 0>;
+        };
+    
+        click_reset_middle: click_reset_middle {
+            compatible = "zmk,input-processor-behaviors";
+            #input-processor-cells = <0>;
+            codes = <INPUT_BTN_MIDDLE>;
+            bindings = <&sl 0>;
         };
     };
 };
