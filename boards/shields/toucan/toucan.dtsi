@@ -110,7 +110,7 @@
         compatible = "zmk,input-listener";
         status = "disabled";
         device = <&glidepoint_split>;
-        input-processors = <&zip_gestures>, <&pointer_accel>, <&zip_xy_scaler 3 4>; 
+        input-processors = <&zip_gestures>, <&pointer_accel>, <&zip_xy_scaler 3 4>;
         scroller {
             layers = <1 2>;
             input-processors = <
@@ -125,6 +125,7 @@
             input-processors = <&touch_processor, &click_reset>;
         };
     };
+
     input_processors {
         touch_processor: touch_processor {
             compatible = "zmk,input-processor-behaviors";
@@ -138,11 +139,7 @@
             #input-processor-cells = <0>;
 
             // mkp 左右・中クリックでベースレイヤーに戻す
-            codes = <
-                INPUT_BTN_LEFT
-                INPUT_BTN_RIGHT
-                INPUT_BTN_MIDDLE
-            >;
+            codes = <INPUT_BTN_LEFT INPUT_BTN_RIGHT INPUT_BTN_MIDDLE>;
             bindings = <&sl 0 &sl 0 &sl 0>;
         };
     };
