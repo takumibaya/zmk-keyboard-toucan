@@ -68,7 +68,7 @@
 	
 	    primary-tap-enable;        // ← これでタップ＝左クリックを有効化
 	
-	    invert-y;                  // 旧: y-invert;
+	    y-invert;                  // 旧: y-invert;
 	    // sleep-mode-enable;      // 強い省電力を使うなら有効に
 	};
 
