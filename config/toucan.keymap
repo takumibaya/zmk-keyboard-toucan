@@ -85,7 +85,7 @@
 
         base {
             bindings = <
-&trans  &kp Q  &kp L  &kp U  &kp COMMA  &kp PERIOD  &kp F  &kp W  &kp R  &kp Y  &kp P  &trans  &trans  &kp E  &hm LCTRL I  &hm LEFT_ALT A  &hm LEFT_SHIFT O  &hm LEFT_GUI MINUS  &hm LEFT_GUI K  &hm RSHIFT T  &hm RIGHT_ALT N  &hm RCTRL S  &kp H  &mo 7  &trans  &kp Z  &kp X  &kp C  &kp V  &kp SEMICOLON  &kp G  &kp D  &kp M  &kp J  &kp B  &trans  &mo 5  &lt 2 BACKSPACE  &hm LEFT_COMMAND SPACE  &hm RIGHT_COMMAND ENTER  &lt 3 TAB  &tog 5
+&trans  &kp Q  &kp L  &kp U  &kp COMMA  &kp PERIOD  &kp F  &kp W  &kp R  &kp Y  &kp P  &trans  &mo 7  &kp E  &hm LCTRL I  &hm LEFT_ALT A  &hm LEFT_SHIFT O  &hm LEFT_GUI MINUS  &hm LEFT_GUI K  &hm RSHIFT T  &hm RIGHT_ALT N  &hm RCTRL S  &kp H  &mo 7  &trans  &kp Z  &kp X  &kp C  &kp V  &kp SEMICOLON  &kp G  &kp D  &kp M  &kp J  &kp B  &trans  &mo 5  &lt 2 BACKSPACE  &hm LEFT_COMMAND SPACE  &hm RIGHT_COMMAND ENTER  &lt 3 TAB  &tog 5
             >;
 
             label = "BASE";
@@ -142,7 +142,7 @@
 
         setting {
             bindings = <
-&none  &none  &none  &none  &none  &none  &none  &kp C_VOL_DN  &kp C_VOLUME_UP  &kp K_MUTE  &bt BT_PRV  &bt BT_NXT  &none  &none  &none  &none  &none  &none  &none  &kp LG(LS(NUMBER_2))  &kp LG(LS(NUMBER_3))  &kp LG(LS(NUMBER_4))  &none  &none  &none  &none  &none  &none  &none  &none  &none  &kp C_BRI_DN  &kp C_BRI_DN  &none  &bt BT_CLR  &bt BT_CLR_ALL  &none  &none  &none  &none  &none  &none
+&none  &none  &none  &none  &none  &none  &none  &kp C_VOL_DN  &kp C_VOLUME_UP  &kp K_MUTE  &bt BT_PRV  &bt BT_NXT  &none  &bootloader  &none  &none  &none  &none  &none  &kp LG(LS(NUMBER_2))  &kp LG(LS(NUMBER_3))  &kp LG(LS(NUMBER_4))  &bootloader  &none  &none  &none  &none  &none  &none  &none  &none  &kp C_BRI_DN  &kp C_BRI_DN  &none  &bt BT_CLR  &bt BT_CLR_ALL  &bootloader  &kp C_BRI_DEC  &kp C_BRI_UP  &kp C_VOLUME_UP  &kp C_VOLUME_DOWN  &kp K_MUTE
             >;
 
             label = "set";
