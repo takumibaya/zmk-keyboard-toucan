@@ -26,9 +26,9 @@
             bindings = <&kp>, <&kp>;
         };
 
-        opl: opl {
+        apl: apl {
             compatible = "zmk,behavior-hold-tap";
-            label = "OPL";
+            label = "APL";
             bindings = <&mo>, <&mkp>;
 
             #binding-cells = <2>;
