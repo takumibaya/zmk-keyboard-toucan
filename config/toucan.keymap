@@ -68,16 +68,6 @@
             bindings = <&to 1>;
             key-positions = <11 10>;
         };
-
-        Bootloader_R {
-            bindings = <&bootloader>;
-            key-positions = <11 10 41>;
-        };
-
-        Bootloader_L {
-            bindings = <&bootloader>;
-            key-positions = <0 1 36>;
-        };
     };
 
     keymap {
