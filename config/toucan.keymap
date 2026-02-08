@@ -92,7 +92,7 @@
         num {
             display-name = "NUM";
             bindings = <
-&kp ESCAPE  &trans  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp COMMA  &kp CARET  &kp LESS_THAN  &kp EQUAL  &kp GREATER_THAN  &trans  &trans  &kp LCTRL  &kp NUMBER_0  &hm LCTRL NUMBER_4  &hm LALT NUMBER_5  &hm LSHIFT NUMBER_6  &mt LEFT_GUI TILDE  &mt RIGHT_GUI PERCENT  &hm RSHIFT PLUS  &hm RALT MINUS  &hm RCTRL ASTERISK  &kp SLASH  &trans  &trans  &kp DOLLAR  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp UNDER  &kp UNDERSCORE  &kp EXCLAMATION  &kp QUESTION  &kp COLON  &kp SEMICOLON  &trans  &none  &trans  &trans  &trans  &lt 6 SPACE  &trans
+&kp ESCAPE  &trans  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp COMMA  &kp CARET  &kp LESS_THAN  &kp EQUAL  &kp GREATER_THAN  &trans  &trans  &trans  &kp NUMBER_0  &hm LCTRL NUMBER_4  &hm LALT NUMBER_5  &hm LSHIFT NUMBER_6  &mt LEFT_GUI TILDE  &mt RIGHT_GUI PERCENT  &hm RSHIFT PLUS  &hm RALT MINUS  &hm RCTRL ASTERISK  &kp SLASH  &trans  &trans  &kp DOLLAR  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp UNDER  &kp UNDERSCORE  &kp EXCLAMATION  &kp QUESTION  &kp COLON  &kp SEMICOLON  &trans  &none  &trans  &trans  &trans  &lt 6 SPACE  &trans
             >;
 
             label = "NUM";
@@ -101,7 +101,7 @@
         nav {
             display-name = "NAV";
             bindings = <
-&kp TAB  &kp EXCL  &kp LEFT_BRACKET  &kp GRAVE  &kp RIGHT_BRACKET  &kp AT_SIGN  &kp LG(EQUAL)  &kp ESCAPE  &kp UP_ARROW  &kp CAPS  &kp PG_UP  &kp HOME  &kp LCTRL  &kp HASH  &hm LCTRL LEFT_PARENTHESIS  &hm LEFT_ALT SQT  &hm LSHIFT RIGHT_PARENTHESIS  &mt LEFT_GUI AMPERSAND  &mt RIGHT_GUI LG(MINUS)  &kp LEFT_ARROW  &kp DOWN  &kp RIGHT  &kp PAGE_DOWN  &kp END  &kp LSHFT  &kp NON_US_BACKSLASH  &kp LEFT_BRACE  &kp DOUBLE_QUOTES  &kp RIGHT_BRACE  &kp PIPE  &kp UNDER  &kp PLUS  &kp GLOBE  &none  &none  &none  &trans  &lt 6 DELETE  &trans  &trans  &trans  &none
+&kp TAB  &none  &kp LEFT_BRACKET  &kp GRAVE  &kp RIGHT_BRACKET  &kp AT_SIGN  &kp LG(EQUAL)  &kp ESCAPE  &kp UP_ARROW  &kp CAPS  &kp PG_UP  &kp HOME  &kp LCTRL  &kp HASH  &hm LCTRL LEFT_PARENTHESIS  &hm LEFT_ALT SQT  &hm LSHIFT RIGHT_PARENTHESIS  &mt LEFT_GUI AMPERSAND  &mt RIGHT_GUI LG(MINUS)  &kp LEFT_ARROW  &kp DOWN  &kp RIGHT  &kp PAGE_DOWN  &kp END  &kp LSHFT  &kp NON_US_BACKSLASH  &kp LEFT_BRACE  &kp DOUBLE_QUOTES  &kp RIGHT_BRACE  &kp PIPE  &kp UNDER  &kp PLUS  &kp GLOBE  &none  &none  &none  &trans  &lt 6 DELETE  &trans  &trans  &trans  &none
             >;
 
             label = "NAV";
