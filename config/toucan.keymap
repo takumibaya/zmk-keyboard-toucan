@@ -110,7 +110,7 @@
         apl {
             label = "APL";
             bindings = <
-&trans  &trans  &kp LG(LEFT_BRACKET)  &kp LEFT_GUI  &kp LG(RIGHT_BRACKET)  &msc MOVE_Y(20)  &mkp RCLK  &msc MOVE_Y(20)  &kp LG(LEFT_BRACKET)  &kp LG(RIGHT_BRACKET)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-20)  &mkp LCLK  &msc MOVE_Y(-20)  &mkp MCLK  &none  &trans  &trans  &trans  &trans  &msc MOVE_X(-15)  &kp LEFT_GUI  &msc MOVE_X(15)  &mkp MCLK  &msc MOVE_X(-15)  &msc MOVE_X(15)  &none  &none  &trans  &trans  &none  &mkp RCLK  &mkp LCLK  &mkp LCLK  &mkp RCLK  &tog 0
+&trans  &trans  &kp LG(LEFT_BRACKET)  &kp LEFT_GUI  &kp LG(RIGHT_BRACKET)  &msc MOVE_Y(20)  &mkp RCLK  &msc MOVE_Y(20)  &kp LG(LEFT_BRACKET)  &kp LG(RIGHT_BRACKET)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-20)  &mkp LCLK  &msc MOVE_Y(-20)  &mkp MCLK  &none  &trans  &trans  &trans  &trans  &msc MOVE_X(-15)  &kp LEFT_GUI  &msc MOVE_X(15)  &mkp MCLK  &msc MOVE_X(-15)  &msc MOVE_X(15)  &none  &none  &trans  &trans  &to 0  &mkp RCLK  &mkp LCLK  &mkp LCLK  &mkp RCLK  &to 0
             >;
         };
 
