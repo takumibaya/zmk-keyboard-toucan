@@ -55,7 +55,7 @@
 
         to-base {
             bindings = <&to 0>;
-            key-positions = <0 1 24>;
+            key-positions = <0 1>;
             layers = <1>;
         };
 
