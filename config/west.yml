@@ -4,6 +4,8 @@ manifest:
   remotes:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
+    - name: cormoran
+      url-base: https://github.com/cormoran
     - name: petejohanson
       url-base: https://github.com/petejohanson
     - name: caksoylar
@@ -12,10 +14,16 @@ manifest:
       url-base: https://github.com/geeksville
     - name: nuovotaka
       url-base: https://github.com/nuovotaka
+    - name: takumibaya
+      url-base: https://github.com/takumibaya
   projects:
     - name: zmk
-      remote: zmkfirmware
+      remote: cormoran
+      revision: v0.3+custom-studio-protocol
       import: app/west.yml
+    - name: toucan-custom-studioo-rpc
+      remote: takumibaya
+      revision: main
     - name: cirque-input-module
       remote: geeksville
       revision: main
