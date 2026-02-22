@@ -147,8 +147,8 @@
     codes = <INPUT_REL_X INPUT_REL_Y>;
 
     sensitivity           = <1000>;  // 2.0x（abs-rel-divisor=2 で半減した入力を補正）
-    min-factor            = <150>;    // 低速時の倍率（少し減速で精密操作）
-    max-factor            = <14000>;  // 高速時の倍率（大きく移動）
+    min-factor            = <80>;     // 低速をしっかり減速（精密操作向け）
+    max-factor            = <20000>;  // 高速を大きくブースト
     speed-threshold       = <2000>;   // 加速開始を少し遅め（低速域を広く確保）
     speed-max             = <1500>;   // この速度でmax-factorに到達
     y-boost               = <1300>;   // 1.05x：縦を僅かにブースト
