@@ -66,7 +66,7 @@
         abs-rel-divisor = <2>;
         x-invert;
         y-invert;
-        //sleep;
+        sleep;
     };
 };
 
