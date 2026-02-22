@@ -148,7 +148,7 @@
 
     sensitivity           = <500>;   // 1.0x 標準感度
     min-factor            = <50>;    // 低速をしっかり減速（精密操作向け）
-    max-factor            = <20000>; // 高速を大きくブースト
+    max-factor            = <15000>; // 高速を大きくブースト
     speed-threshold       = <4000>;  // 加速開始（divisor=1 に合わせて倍）
     speed-max             = <3000>;  // この速度でmax-factorに到達（同上）
     y-boost               = <1300>;  // 1.05x：縦を僅かにブースト
