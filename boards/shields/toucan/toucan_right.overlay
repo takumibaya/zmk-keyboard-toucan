@@ -63,7 +63,7 @@
         status = "okay";
         dr-gpios = <&gpio0 2 (GPIO_ACTIVE_HIGH)>;
         sensitivity = "3x";
-        abs-rel-divisor = <1>;
+        abs-rel-divisor = <2>;
         x-invert;
         y-invert;
         //sleep;

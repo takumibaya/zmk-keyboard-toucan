@@ -113,7 +113,7 @@
         input-processors = <
             &touch_processor
             &pointer_accel
-            &zip_xy_scaler 3 4
+            &zip_xy_scaler 3 2
         >;
         scroller {
             layers = <1 2>;
@@ -126,13 +126,7 @@
 
         base {
             layers = <0>;
-            input-processors = <
-                &touch_processor
-                &click_reset_left
-                &click_reset_right
-                &click_reset_middle
-            >;
-
+            input-processors = <&touch_processor>;
         };
     };
 
@@ -145,26 +139,6 @@
         bindings = <&mo 4>;
         };
     
-        click_reset_left: click_reset_left {
-            compatible = "zmk,input-processor-behaviors";
-            #input-processor-cells = <0>;
-            codes = <INPUT_BTN_LEFT>;
-            bindings = <&sl 0>;
-        };
-    
-        click_reset_right: click_reset_right {
-            compatible = "zmk,input-processor-behaviors";
-            #input-processor-cells = <0>;
-            codes = <INPUT_BTN_RIGHT>;
-            bindings = <&sl 0>;
-        };
-    
-        click_reset_middle: click_reset_middle {
-            compatible = "zmk,input-processor-behaviors";
-            #input-processor-cells = <0>;
-            codes = <INPUT_BTN_MIDDLE>;
-            bindings = <&sl 0>;
-        };
     };
 };
 
@@ -179,8 +153,7 @@
     speed-max             = <3000>;   // 中〜高速でmax到達
     y-boost               = <1300>;   // 1.05x：縦を僅かにブースト
     acceleration-exponent = <2>;      // 二次関数（滑らかで自然）
-    sensor-dpi            = <400>;
-    track-remainders;
+    sensor-dpi            = <200>;
 };
 
 &zip_gestures {
