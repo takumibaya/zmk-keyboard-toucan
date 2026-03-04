@@ -70,13 +70,13 @@
         };
 
         combo-fast-scroll {
-            bindings = <&tog 8>;
+            bindings = <&sl 8>;
             key-positions = <18 6>;
             layers = <4 5>;
         };
 
         combo-fast-scroll-l {
-            bindings = <&tog 8>;
+            bindings = <&sl 8>;
             key-positions = <5 17>;
         };
     };
