@@ -10,6 +10,7 @@
 #define NAV   3
 #define MOUSE 4
 #define ADJ   5
+#define FAST_SCROLL 8
 
 // quick-tap-ms: 二度押し時にタップキーが連続入力される設定
 
@@ -27,34 +28,6 @@
             bindings = <&kp>, <&kp>;
         };
 
-        // スクロール tap-dance: 1回=通常速度, 2回=高速 (120ms判定)
-        td_sd: tap_dance_scroll_down {
-            compatible = "zmk,behavior-tap-dance";
-            #binding-cells = <0>;
-            tapping-term-ms = <120>;
-            bindings = <&msc MOVE_Y(20)>, <&msc MOVE_Y(80)>;
-        };
-
-        td_su: tap_dance_scroll_up {
-            compatible = "zmk,behavior-tap-dance";
-            #binding-cells = <0>;
-            tapping-term-ms = <120>;
-            bindings = <&msc MOVE_Y(-20)>, <&msc MOVE_Y(-80)>;
-        };
-
-        td_sr: tap_dance_scroll_right {
-            compatible = "zmk,behavior-tap-dance";
-            #binding-cells = <0>;
-            tapping-term-ms = <120>;
-            bindings = <&msc MOVE_X(15)>, <&msc MOVE_X(60)>;
-        };
-
-        td_sl: tap_dance_scroll_left {
-            compatible = "zmk,behavior-tap-dance";
-            #binding-cells = <0>;
-            tapping-term-ms = <120>;
-            bindings = <&msc MOVE_X(-15)>, <&msc MOVE_X(-60)>;
-        };
     };
 
     conditional_layers { compatible = "zmk,conditional-layers"; };
@@ -95,6 +68,12 @@
         to-qwerty {
             bindings = <&to 1>;
             key-positions = <11 10>;
+        };
+
+        combo-fast-scroll {
+            bindings = <&tog FAST_SCROLL>;
+            key-positions = <5 18>;
+            layers = <4 5>;
         };
     };
 
@@ -139,13 +118,13 @@
         apl {
             label = "APL";
             bindings = <
-&trans  &trans  &kp LG(LEFT_BRACKET)  &kp LEFT_GUI  &kp LG(RIGHT_BRACKET)  &td_sd  &td_sd  &kp LG(LEFT_BRACKET)  &mmv MOVE_Y(-1200)  &kp LG(RIGHT_BRACKET)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &td_su  &mkp LCLK  &mkp RCLK  &mmv MOVE_X(1200)  &trans  &trans  &trans  &trans  &td_sl  &mkp MCLK  &td_sr  &td_su  &mkp MCLK  &td_sl  &mkp MCLK  &td_sr  &trans  &trans  &none  &mkp RCLK  &mkp LCLK  &mkp LCLK  &mkp RCLK  &tog 0
+&trans  &trans  &kp LG(LEFT_BRACKET)  &kp LEFT_GUI  &kp LG(RIGHT_BRACKET)  &msc MOVE_Y(20)  &msc MOVE_Y(20)  &kp LG(LEFT_BRACKET)  &mmv MOVE_Y(-1200)  &kp LG(RIGHT_BRACKET)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-20)  &mkp LCLK  &mkp RCLK  &mmv MOVE_X(1200)  &trans  &trans  &trans  &trans  &msc MOVE_X(-15)  &mkp MCLK  &msc MOVE_X(15)  &msc MOVE_Y(-20)  &mkp MCLK  &msc MOVE_X(-15)  &mkp MCLK  &msc MOVE_X(15)  &trans  &trans  &none  &mkp RCLK  &mkp LCLK  &mkp LCLK  &mkp RCLK  &tog 0
             >;
         };
 
         ctrl {
             bindings = <
-&trans  &trans  &kp LG(LEFT_BRACKET)  &kp LEFT_GUI  &kp LG(RIGHT_BRACKET)  &td_sd  &td_sd  &kp LG(LEFT_BRACKET)  &mmv MOVE_Y(-1200)  &kp LG(RIGHT_BRACKET)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &td_su  &td_su  &mmv MOVE_X(-1200)  &mmv MOVE_Y(1200)  &mmv MOVE_X(1200)  &trans  &trans  &trans  &trans  &td_sl  &kp LEFT_GUI  &td_sr  &mkp MCLK  &mkp LCLK  &td_sl  &mkp MCLK  &td_sr  &trans  &trans  &none  &mkp RCLK  &mkp LCLK  &mkp LCLK  &mkp RCLK  &tog 0
+&trans  &trans  &kp LG(LEFT_BRACKET)  &kp LEFT_GUI  &kp LG(RIGHT_BRACKET)  &msc MOVE_Y(20)  &msc MOVE_Y(20)  &kp LG(LEFT_BRACKET)  &mmv MOVE_Y(-1200)  &kp LG(RIGHT_BRACKET)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-20)  &msc MOVE_Y(-20)  &mmv MOVE_X(-1200)  &mmv MOVE_Y(1200)  &mmv MOVE_X(1200)  &trans  &trans  &trans  &trans  &msc MOVE_X(-15)  &kp LEFT_GUI  &msc MOVE_X(15)  &mkp MCLK  &mkp LCLK  &msc MOVE_X(-15)  &mkp MCLK  &msc MOVE_X(15)  &trans  &trans  &none  &mkp RCLK  &mkp LCLK  &mkp LCLK  &mkp RCLK  &tog 0
             >;
 
             label = "Ctrl";
@@ -155,6 +134,13 @@
             display-name = "ADJ";
             bindings = <
 &kp LC(UP_ARROW)  &kp LA(LC(R))  &kp LA(LC(Q))  &kp LA(LC(W))  &kp LC(LA(E))  &kp LA(LC(LEFT_ARROW))  &trans  &kp F1  &kp F2  &kp F3  &kp F10  &kp C_BRI_UP  &kp LC(DOWN_ARROW)  &kp LA(LC(F))  &kp LA(LC(A))  &kp LA(LC(S))  &kp LA(LC(D))  &kp LC(LA(RIGHT))  &trans  &kp F4  &kp F5  &kp F6  &kp F11  &kp C_BRI_DN  &trans  &none  &kp LA(LC(Z))  &kp LA(LC(X))  &kp LC(LA(C))  &kp LA(LC(V))  &trans  &kp F7  &kp F8  &kp F9  &kp F12  &trans  &none  &kp LC(LA(C))  &none  &none  &trans  &trans
+            >;
+        };
+
+        fast_scroll {
+            label = "FAST";
+            bindings = <
+&trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(80)  &msc MOVE_Y(80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_X(-60)  &trans  &msc MOVE_X(60)  &trans  &trans  &msc MOVE_X(-60)  &trans  &msc MOVE_X(60)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
             >;
         };
 
