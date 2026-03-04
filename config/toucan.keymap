@@ -27,6 +27,14 @@
             flavor = "tap-preferred";
             bindings = <&kp>, <&kp>;
         };
+
+        // Ctrlレイヤー切り替え: 1回長押し=mo, 2回タップ=tog
+        td_ctrl: tap_dance_ctrl {
+            compatible = "zmk,behavior-tap-dance";
+            #binding-cells = <0>;
+            tapping-term-ms = <200>;
+            bindings = <&mo 5>, <&tog 5>;
+        };
     };
 
     conditional_layers { compatible = "zmk,conditional-layers"; };
@@ -86,7 +94,7 @@
 
         base {
             bindings = <
-&trans  &kp Q  &kp L  &kp U  &kp COMMA  &kp PERIOD  &kp F  &kp W  &kp R  &kp Y  &kp P  &trans  &mo 7  &kp E  &hm LCTRL I  &hm LEFT_ALT A  &hm LEFT_SHIFT O  &hm LEFT_GUI MINUS  &hm LEFT_GUI K  &hm RSHIFT T  &hm RIGHT_ALT N  &hm RCTRL S  &kp H  &mo 7  &trans  &kp Z  &kp X  &kp C  &kp V  &kp SEMICOLON  &kp G  &kp D  &kp M  &kp J  &kp B  &trans  &mo 5  &lt 2 BACKSPACE  &hm LEFT_COMMAND SPACE  &hm RIGHT_COMMAND ENTER  &lt 3 TAB  &tog 5
+&trans  &kp Q  &kp L  &kp U  &kp COMMA  &kp PERIOD  &kp F  &kp W  &kp R  &kp Y  &kp P  &trans  &mo 7  &kp E  &hm LCTRL I  &hm LEFT_ALT A  &hm LEFT_SHIFT O  &hm LEFT_GUI MINUS  &hm LEFT_GUI K  &hm RSHIFT T  &hm RIGHT_ALT N  &hm RCTRL S  &kp H  &mo 7  &trans  &kp Z  &kp X  &kp C  &kp V  &kp SEMICOLON  &kp G  &kp D  &kp M  &kp J  &kp B  &trans  &td_ctrl  &lt 2 BACKSPACE  &hm LEFT_COMMAND SPACE  &hm RIGHT_COMMAND ENTER  &lt 3 TAB  &td_ctrl
             >;
 
             label = "BASE";
@@ -95,7 +103,7 @@
         qwert {
             display-name = "QWERT";
             bindings = <
-&kp TAB  &kp Q  &kp W  &kp E  &kp R  &kp T  &kp Y  &kp U  &kp I  &kp O  &kp P  &kp BSPC  &kp LCTRL  &kp A  &hm LCTRL S  &hm LALT D  &hm LSHIFT F  &hm LEFT_GUI G  &hm RIGHT_GUI H  &hm RSHIFT J  &hm RALT K  &hm RCTRL L  &kp SEMI  &kp SQT  &kp LSHFT  &kp Z  &kp X  &kp C  &kp V  &kp B  &kp N  &kp M  &kp COMMA  &kp DOT  &kp FSLH  &kp ESC  &mo 5  &lt 2 BACKSPACE  &hm LEFT_COMMAND SPACE  &hm RIGHT_COMMAND ENTER  &lt 3 TAB  &mkp LCLK
+&kp TAB  &kp Q  &kp W  &kp E  &kp R  &kp T  &kp Y  &kp U  &kp I  &kp O  &kp P  &kp BSPC  &kp LCTRL  &kp A  &hm LCTRL S  &hm LALT D  &hm LSHIFT F  &hm LEFT_GUI G  &hm RIGHT_GUI H  &hm RSHIFT J  &hm RALT K  &hm RCTRL L  &kp SEMI  &kp SQT  &kp LSHFT  &kp Z  &kp X  &kp C  &kp V  &kp B  &kp N  &kp M  &kp COMMA  &kp DOT  &kp FSLH  &kp ESC  &td_ctrl  &lt 2 BACKSPACE  &hm LEFT_COMMAND SPACE  &hm RIGHT_COMMAND ENTER  &lt 3 TAB  &td_ctrl
             >;
 
             label = "QWERT";
