@@ -27,32 +27,32 @@
             bindings = <&kp>, <&kp>;
         };
 
-        // スクロール tap-dance: 1回=通常速度, 2回=高速
+        // スクロール tap-dance: 1回=通常速度, 2回=高速 (120ms判定)
         td_sd: tap_dance_scroll_down {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
-            tapping-term-ms = <200>;
+            tapping-term-ms = <120>;
             bindings = <&msc MOVE_Y(20)>, <&msc MOVE_Y(80)>;
         };
 
         td_su: tap_dance_scroll_up {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
-            tapping-term-ms = <200>;
+            tapping-term-ms = <120>;
             bindings = <&msc MOVE_Y(-20)>, <&msc MOVE_Y(-80)>;
         };
 
         td_sr: tap_dance_scroll_right {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
-            tapping-term-ms = <200>;
+            tapping-term-ms = <120>;
             bindings = <&msc MOVE_X(15)>, <&msc MOVE_X(60)>;
         };
 
         td_sl: tap_dance_scroll_left {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
-            tapping-term-ms = <200>;
+            tapping-term-ms = <120>;
             bindings = <&msc MOVE_X(-15)>, <&msc MOVE_X(-60)>;
         };
     };
