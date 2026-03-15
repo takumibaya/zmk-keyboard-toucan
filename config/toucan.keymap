@@ -29,6 +29,7 @@
         };
 
         // Ctrlレイヤー切り替え: 1回長押し=mo, 2回タップ=tog
+
         td_ctrl: tap_dance_ctrl {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
@@ -69,11 +70,11 @@
 
         unlock {
             bindings = <&studio_unlock>;
-            key-positions = <0 1>;
+            key-positions = <0 1 10 11>;
         };
 
         to-qwerty {
-            bindings = <&to 1>;
+            bindings = <&to 2>;
             key-positions = <11 10>;
         };
 
@@ -87,6 +88,16 @@
             bindings = <&sl 8>;
             key-positions = <5 17>;
         };
+
+        combo-fast-scroll-h-r {
+            bindings = <&sl 8>;
+            key-positions = <31 33>;
+        };
+
+        combo-fast-scroll-h-l {
+            bindings = <&sl 8>;
+            key-positions = <28 26>;
+        };
     };
 
     keymap {
@@ -94,19 +105,10 @@
 
         base {
             bindings = <
-&trans  &kp Q  &kp L  &kp U  &kp COMMA  &kp PERIOD  &kp F  &kp W  &kp R  &kp Y  &kp P  &trans  &mo 7  &kp E  &hm LCTRL I  &hm LEFT_ALT A  &hm LEFT_SHIFT O  &hm LEFT_GUI MINUS  &hm LEFT_GUI K  &hm RSHIFT T  &hm RIGHT_ALT N  &hm RCTRL S  &kp H  &mo 7  &trans  &kp Z  &kp X  &kp C  &kp V  &kp SEMICOLON  &kp G  &kp D  &kp M  &kp J  &kp B  &trans  &td_ctrl  &lt 2 BACKSPACE  &hm LEFT_COMMAND SPACE  &hm RIGHT_COMMAND ENTER  &lt 3 TAB  &td_ctrl
+&trans  &kp Q  &kp L  &kp U  &kp COMMA  &kp PERIOD  &kp F  &kp W  &kp R  &kp Y  &kp P  &trans  &mo 7  &kp E  &hm LCTRL I  &hm LEFT_ALT A  &hm LEFT_SHIFT O  &hm LEFT_GUI MINUS  &hm LEFT_GUI K  &hm RSHIFT T  &hm RIGHT_ALT N  &hm RCTRL S  &kp H  &mo 7  &trans  &kp Z  &kp X  &kp C  &kp V  &kp SEMICOLON  &kp G  &kp D  &kp M  &kp J  &kp B  &trans  &td_ctrl  &lt 1 BACKSPACE  &hm LEFT_COMMAND SPACE  &hm RIGHT_COMMAND ENTER  &lt 3 TAB  &td_ctrl
             >;
 
             label = "BASE";
-        };
-
-        qwert {
-            display-name = "QWERT";
-            bindings = <
-&kp TAB  &kp Q  &kp W  &kp E  &kp R  &kp T  &kp Y  &kp U  &kp I  &kp O  &kp P  &kp BSPC  &kp LCTRL  &kp A  &hm LCTRL S  &hm LALT D  &hm LSHIFT F  &hm LEFT_GUI G  &hm RIGHT_GUI H  &hm RSHIFT J  &hm RALT K  &hm RCTRL L  &kp SEMI  &kp SQT  &kp LSHFT  &kp Z  &kp X  &kp C  &kp V  &kp B  &kp N  &kp M  &kp COMMA  &kp DOT  &kp FSLH  &kp ESC  &td_ctrl  &lt 2 BACKSPACE  &hm LEFT_COMMAND SPACE  &hm RIGHT_COMMAND ENTER  &lt 3 TAB  &td_ctrl
-            >;
-
-            label = "QWERT";
         };
 
         num {
@@ -116,6 +118,15 @@
             >;
 
             label = "NUM";
+        };
+
+        qwert {
+            display-name = "QWERT";
+            bindings = <
+&kp TAB  &kp Q  &kp W  &kp E  &kp R  &kp T  &kp Y  &kp U  &kp I  &kp O  &kp P  &kp BSPC  &kp LCTRL  &kp A  &hm LCTRL S  &hm LALT D  &hm LSHIFT F  &hm LEFT_GUI G  &hm RIGHT_GUI H  &hm RSHIFT J  &hm RALT K  &hm RCTRL L  &kp SEMI  &kp SQT  &kp LSHFT  &kp Z  &kp X  &kp C  &kp V  &kp B  &kp N  &kp M  &kp COMMA  &kp DOT  &kp FSLH  &kp ESC  &td_ctrl  &lt 1 BACKSPACE  &hm LEFT_COMMAND SPACE  &hm RIGHT_COMMAND ENTER  &lt 3 TAB  &td_ctrl
+            >;
+
+            label = "QWERT";
         };
 
         nav {
