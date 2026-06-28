@@ -158,8 +158,10 @@
 
 &zip_gestures {
     tap-detection;
-    tap-timout-ms = <150>;
-    prevent_movement_during_tap;
+    tap-timout-ms = <120>;   // タップ判定ウィンドウ。150→120(作者デフォルト)に短縮し触り始めの待ちを軽減
+    // prevent_movement_during_tap;
+    //   ↑ タップ判定中は移動を全て無視する設定。binding公式説明どおり「触り始めがもっさり」する原因なので無効化。
+    //     副作用: タップ(クリック)時にカーソルが僅かにズレやすくなる。クリック誤爆が増えるなら上行を戻す。
 
     circular-scroll;
     circular-scroll-rim-percent = <20>;
