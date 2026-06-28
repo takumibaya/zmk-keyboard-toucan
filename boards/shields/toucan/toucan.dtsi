@@ -146,13 +146,16 @@
     input-type = <INPUT_EV_REL>;
     codes = <INPUT_REL_X INPUT_REL_Y>;
 
-    sensitivity           = <500>;   // 1.0x 標準感度
-    min-factor            = <50>;    // 低速をしっかり減速（精密操作向け）
-    max-factor            = <15000>; // 高速を大きくブースト
-    speed-threshold       = <4000>;  // 加速開始（divisor=1 に合わせて倍）
-    speed-max             = <3000>;  // この速度でmax-factorに到達（同上）
-    y-boost               = <1300>;  // 1.05x：縦を僅かにブースト
-    acceleration-exponent = <2>;     // 二次関数（滑らかで自然）
+    // Mac風加速カーブ。STANDARD(level2)の検証範囲内に収める＝この範囲外だと
+    // accel_validate_config が失敗しデバイス初期化エラー→加速が一切効かなくなる。
+    // 速度の単位: 約(1レポートのカウント)×100 カウント/秒（Cirqueは約10ms間隔）。
+    sensitivity           = <500>;   // 基準~1.0x（sensor-dpi=400補正後）。後段 zip_xy_scaler(3/4) で実効~0.75x
+    min-factor            = <900>;   // 低速は0.9x相当（精密寄り。範囲200-2000）
+    max-factor            = <4000>;  // 速い動きで最大4.0x（実効~3.0x）。"大きく動かすと伸びる"の主役。範囲1000-10000
+    speed-threshold       = <500>;   // 早めに加速開始（Mac風。~5カウント/レポート）。speed-max未満必須
+    speed-max             = <2400>;  // 中〜速フリックで最大到達（作者trackpadプリセット準拠）。範囲speed-threshold超〜
+    y-boost               = <1000>;  // 縦横同率（Macに合わせ旧1.3xの縦ブーストを解除）。範囲500-3000
+    acceleration-exponent = <2>;     // 二次（滑らかで自然）。範囲1-5。もっと急にしたいなら3
     sensor-dpi            = <400>;
 };
 
