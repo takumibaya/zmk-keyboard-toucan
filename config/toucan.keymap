@@ -207,7 +207,7 @@
             display-name = "APLF";
             label = "APLF";
             bindings = <
-&trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(80)  &msc MOVE_Y(80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_X(-80)  &trans  &msc MOVE_X(80)  &msc MOVE_Y(-80)  &msc MOVE_X(-80)  &msc MOVE_X(80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(80)  &msc MOVE_Y(80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_X(-112)  &trans  &msc MOVE_X(112)  &msc MOVE_Y(-80)  &msc MOVE_X(-112)  &msc MOVE_X(112)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
             >;
         };
 
@@ -215,7 +215,7 @@
             display-name = "CTLF";
             label = "CTLF";
             bindings = <
-&trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(80)  &msc MOVE_Y(80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-80)  &msc MOVE_Y(-80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_X(-80)  &trans  &msc MOVE_X(80)  &trans  &trans  &msc MOVE_X(-80)  &trans  &msc MOVE_X(80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(80)  &msc MOVE_Y(80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-80)  &msc MOVE_Y(-80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_X(-112)  &trans  &msc MOVE_X(112)  &trans  &trans  &msc MOVE_X(-112)  &trans  &msc MOVE_X(112)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
             >;
         };
     };
