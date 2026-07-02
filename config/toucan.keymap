@@ -4,12 +4,14 @@
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/pointing.h>
 
-#define BASE  0
-#define QWERT 1
-#define NUM   2
-#define NAV   3
-#define MOUSE 4
-#define ADJ   5
+#define BASE        0
+#define QWRT        1
+#define NUM         2
+#define NAV         3
+#define APL         4
+#define CTRL        5
+#define ADJ         6
+#define SET         7
 #define FAST_SCROLL 8
 
 // quick-tap-ms: 二度押し時にタップキーが連続入力される設定
@@ -34,7 +36,7 @@
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
             tapping-term-ms = <200>;
-            bindings = <&mo 5>, <&tog 5>;
+            bindings = <&mo CTRL>, <&tog CTRL>;
         };
     };
 
@@ -64,7 +66,7 @@
         };
 
         to-base {
-            bindings = <&to 0>;
+            bindings = <&to BASE>;
             key-positions = <0 1>;
         };
 
@@ -74,28 +76,28 @@
         };
 
         to-qwerty {
-            bindings = <&to 1>;
+            bindings = <&to QWRT>;
             key-positions = <11 10>;
         };
 
         combo-fast-scroll {
-            bindings = <&sl 8>;
+            bindings = <&sl FAST_SCROLL>;
             key-positions = <18 6>;
-            layers = <4 5>;
+            layers = <APL CTRL>;
         };
 
         combo-fast-scroll-l {
-            bindings = <&sl 8>;
+            bindings = <&sl FAST_SCROLL>;
             key-positions = <5 17>;
         };
 
         combo-fast-scroll-h-r {
-            bindings = <&sl 8>;
+            bindings = <&sl FAST_SCROLL>;
             key-positions = <31 33>;
         };
 
         combo-fast-scroll-h-l {
-            bindings = <&sl 8>;
+            bindings = <&sl FAST_SCROLL>;
             key-positions = <28 26>;
         };
     };
@@ -105,25 +107,25 @@
 
         base {
             bindings = <
-&trans  &kp Q  &kp L  &kp U  &kp COMMA  &kp PERIOD  &kp F  &kp W  &kp R  &kp Y  &kp P  &trans  &mo 7  &kp E  &hm LCTRL I  &hm LEFT_ALT A  &hm LEFT_SHIFT O  &hm LEFT_GUI MINUS  &hm LEFT_GUI K  &hm RSHIFT T  &hm RIGHT_ALT N  &hm RCTRL S  &kp H  &mo 7  &trans  &kp Z  &kp X  &kp C  &kp V  &kp SEMICOLON  &kp G  &kp D  &kp M  &kp J  &kp B  &trans  &td_ctrl  &lt 2 BACKSPACE  &hm LEFT_COMMAND SPACE  &hm RIGHT_COMMAND ENTER  &lt 3 TAB  &td_ctrl
+&trans  &kp Q  &kp L  &kp U  &kp COMMA  &kp PERIOD  &kp F  &kp W  &kp R  &kp Y  &kp P  &trans  &mo SET  &kp E  &hm LCTRL I  &hm LEFT_ALT A  &hm LEFT_SHIFT O  &hm LEFT_GUI MINUS  &hm LEFT_GUI K  &hm RSHIFT T  &hm RIGHT_ALT N  &hm RCTRL S  &kp H  &mo SET  &trans  &kp Z  &kp X  &kp C  &kp V  &kp SEMICOLON  &kp G  &kp D  &kp M  &kp J  &kp B  &trans  &td_ctrl  &lt NUM BACKSPACE  &hm LEFT_COMMAND SPACE  &hm RIGHT_COMMAND ENTER  &lt NAV TAB  &td_ctrl
             >;
 
             label = "BASE";
         };
 
         qwert {
-            display-name = "QWERT";
+            display-name = "QWRT";
             bindings = <
-&kp TAB  &kp Q  &kp W  &kp E  &kp R  &kp T  &kp Y  &kp U  &kp I  &kp O  &kp P  &kp BSPC  &kp LCTRL  &kp A  &hm LCTRL S  &hm LALT D  &hm LSHIFT F  &hm LEFT_GUI G  &hm RIGHT_GUI H  &hm RSHIFT J  &hm RALT K  &hm RCTRL L  &kp SEMI  &kp SQT  &kp LSHFT  &kp Z  &kp X  &kp C  &kp V  &kp B  &kp N  &kp M  &kp COMMA  &kp DOT  &kp FSLH  &kp ESC  &td_ctrl  &lt 2 BACKSPACE  &hm LEFT_COMMAND SPACE  &hm RIGHT_COMMAND ENTER  &lt 3 TAB  &td_ctrl
+&kp TAB  &kp Q  &kp W  &kp E  &kp R  &kp T  &kp Y  &kp U  &kp I  &kp O  &kp P  &kp BSPC  &kp LCTRL  &kp A  &hm LCTRL S  &hm LALT D  &hm LSHIFT F  &hm LEFT_GUI G  &hm RIGHT_GUI H  &hm RSHIFT J  &hm RALT K  &hm RCTRL L  &kp SEMI  &kp SQT  &kp LSHFT  &kp Z  &kp X  &kp C  &kp V  &kp B  &kp N  &kp M  &kp COMMA  &kp DOT  &kp FSLH  &kp ESC  &td_ctrl  &lt NUM BACKSPACE  &hm LEFT_COMMAND SPACE  &hm RIGHT_COMMAND ENTER  &lt NAV TAB  &td_ctrl
             >;
 
-            label = "QWERT";
+            label = "QWRT";
         };
 
         num {
             display-name = "NUM";
             bindings = <
-&kp ESCAPE  &trans  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp COMMA  &kp CARET  &kp LESS_THAN  &kp EQUAL  &kp GREATER_THAN  &trans  &trans  &trans  &kp NUMBER_0  &hm LCTRL NUMBER_4  &hm LALT NUMBER_5  &hm LSHIFT NUMBER_6  &hm LEFT_GUI TILDE  &hm RIGHT_GUI PIPE  &hm RSHIFT PLUS  &hm RALT MINUS  &hm RCTRL ASTERISK  &kp SLASH  &trans  &trans  &kp DOLLAR  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp BACKSLASH  &kp UNDERSCORE  &kp EXCLAMATION  &kp QUESTION  &kp COLON  &kp SEMICOLON  &trans  &none  &trans  &trans  &trans  &lt 6 SPACE  &trans
+&kp ESCAPE  &trans  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp COMMA  &kp CARET  &kp LESS_THAN  &kp EQUAL  &kp GREATER_THAN  &trans  &trans  &trans  &kp NUMBER_0  &hm LCTRL NUMBER_4  &hm LALT NUMBER_5  &hm LSHIFT NUMBER_6  &hm LEFT_GUI TILDE  &hm RIGHT_GUI PIPE  &hm RSHIFT PLUS  &hm RALT MINUS  &hm RCTRL ASTERISK  &kp SLASH  &trans  &trans  &kp DOLLAR  &kp NUMBER_7  &kp NUMBER_8  &kp NUMBER_9  &kp BACKSLASH  &kp UNDERSCORE  &kp EXCLAMATION  &kp QUESTION  &kp COLON  &kp SEMICOLON  &trans  &none  &trans  &trans  &trans  &lt ADJ SPACE  &trans
             >;
 
             label = "NUM";
@@ -132,7 +134,7 @@
         nav {
             display-name = "NAV";
             bindings = <
-&kp TAB  &none  &kp LEFT_BRACKET  &kp GRAVE  &kp RIGHT_BRACKET  &kp AT_SIGN  &kp LG(EQUAL)  &kp ESCAPE  &kp UP_ARROW  &kp CAPS  &kp PG_UP  &kp HOME  &kp LCTRL  &kp HASH  &hm LCTRL LEFT_PARENTHESIS  &hm LEFT_ALT SQT  &hm LSHIFT RIGHT_PARENTHESIS  &hm LEFT_GUI AMPERSAND  &hm RIGHT_GUI LG(MINUS)  &kp LEFT_ARROW  &kp DOWN  &kp RIGHT  &kp PAGE_DOWN  &kp END  &kp LSHFT  &kp INT_YEN  &kp LEFT_BRACE  &kp DOUBLE_QUOTES  &kp RIGHT_BRACE  &kp PERCENT  &kp UNDER  &kp PLUS  &kp GLOBE  &none  &none  &none  &trans  &lt 6 DELETE  &trans  &trans  &trans  &none
+&kp TAB  &none  &kp LEFT_BRACKET  &kp GRAVE  &kp RIGHT_BRACKET  &kp AT_SIGN  &kp LG(EQUAL)  &kp ESCAPE  &kp UP_ARROW  &kp CAPS  &kp PG_UP  &kp HOME  &kp LCTRL  &kp HASH  &hm LCTRL LEFT_PARENTHESIS  &hm LEFT_ALT SQT  &hm LSHIFT RIGHT_PARENTHESIS  &hm LEFT_GUI AMPERSAND  &hm RIGHT_GUI LG(MINUS)  &kp LEFT_ARROW  &kp DOWN  &kp RIGHT  &kp PAGE_DOWN  &kp END  &kp LSHFT  &kp INT_YEN  &kp LEFT_BRACE  &kp DOUBLE_QUOTES  &kp RIGHT_BRACE  &kp PERCENT  &kp UNDER  &kp PLUS  &kp GLOBE  &none  &none  &none  &trans  &lt ADJ DELETE  &trans  &trans  &trans  &none
             >;
 
             label = "NAV";
@@ -141,16 +143,16 @@
         apl {
             label = "APL";
             bindings = <
-&trans  &trans  &kp LG(LEFT_BRACKET)  &kp LEFT_GUI  &kp LG(RIGHT_BRACKET)  &msc MOVE_Y(20)  &msc MOVE_Y(20)  &kp LG(LEFT_BRACKET)  &mmv MOVE_Y(-1200)  &kp LG(RIGHT_BRACKET)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-20)  &mkp LCLK  &mkp RCLK  &mmv MOVE_X(1200)  &trans  &trans  &trans  &trans  &msc MOVE_X(-5)  &mkp MCLK  &msc MOVE_X(5)  &msc MOVE_Y(-20)  &mkp MCLK  &msc MOVE_X(-5)  &mkp MCLK  &msc MOVE_X(5)  &trans  &trans  &none  &mkp RCLK  &mkp LCLK  &mkp LCLK  &mkp RCLK  &tog 0
+&trans  &trans  &kp LG(LEFT_BRACKET)  &kp LEFT_GUI  &kp LG(RIGHT_BRACKET)  &msc MOVE_Y(20)  &msc MOVE_Y(20)  &kp LG(LEFT_BRACKET)  &mmv MOVE_Y(-1200)  &kp LG(RIGHT_BRACKET)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-20)  &mkp LCLK  &mkp RCLK  &mmv MOVE_X(1200)  &trans  &trans  &trans  &trans  &msc MOVE_X(-5)  &mkp MCLK  &msc MOVE_X(5)  &msc MOVE_Y(-20)  &mkp MCLK  &msc MOVE_X(-5)  &mkp MCLK  &msc MOVE_X(5)  &trans  &trans  &none  &mkp RCLK  &mkp LCLK  &mkp LCLK  &mkp RCLK  &tog BASE
             >;
         };
 
         ctrl {
             bindings = <
-&trans  &trans  &kp LG(LEFT_BRACKET)  &kp LEFT_GUI  &kp LG(RIGHT_BRACKET)  &msc MOVE_Y(20)  &msc MOVE_Y(20)  &kp LG(LEFT_BRACKET)  &mmv MOVE_Y(-1200)  &kp LG(RIGHT_BRACKET)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-20)  &msc MOVE_Y(-20)  &mmv MOVE_X(-1200)  &mmv MOVE_Y(1200)  &mmv MOVE_X(1200)  &trans  &trans  &trans  &trans  &msc MOVE_X(-15)  &kp LEFT_GUI  &msc MOVE_X(15)  &mkp MCLK  &mkp LCLK  &msc MOVE_X(-15)  &mkp MCLK  &msc MOVE_X(15)  &trans  &trans  &none  &mkp RCLK  &mkp LCLK  &mkp LCLK  &mkp RCLK  &tog 0
+&trans  &trans  &kp LG(LEFT_BRACKET)  &kp LEFT_GUI  &kp LG(RIGHT_BRACKET)  &msc MOVE_Y(20)  &msc MOVE_Y(20)  &kp LG(LEFT_BRACKET)  &mmv MOVE_Y(-1200)  &kp LG(RIGHT_BRACKET)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-20)  &msc MOVE_Y(-20)  &mmv MOVE_X(-1200)  &mmv MOVE_Y(1200)  &mmv MOVE_X(1200)  &trans  &trans  &trans  &trans  &msc MOVE_X(-15)  &kp LEFT_GUI  &msc MOVE_X(15)  &mkp MCLK  &mkp LCLK  &msc MOVE_X(-15)  &mkp MCLK  &msc MOVE_X(15)  &trans  &trans  &none  &mkp RCLK  &mkp LCLK  &mkp LCLK  &mkp RCLK  &tog BASE
             >;
 
-            label = "Ctrl";
+            label = "CTRL";
         };
 
         adj {
@@ -165,7 +167,7 @@
 &none  &none  &none  &none  &none  &none  &none  &none  &none  &none  &bt BT_PRV  &bt BT_NXT  &none  &bootloader  &kp LCTRL  &kp LEFT_ALT  &kp LEFT_SHIFT  &kp LEFT_GUI  &kp PRINTSCREEN  &kp LG(LS(NUMBER_2))  &kp LG(LS(NUMBER_3))  &kp LG(LS(NUMBER_4))  &bootloader  &none  &none  &none  &none  &none  &none  &none  &none  &kp C_BRI_DN  &kp C_BRI_DN  &none  &bt BT_CLR  &bt BT_CLR_ALL  &bootloader  &kp C_BRI_DEC  &kp C_BRI_UP  &kp C_VOLUME_DOWN  &kp C_VOLUME_UP  &kp K_MUTE
             >;
 
-            label = "set";
+            label = "SET";
         };
 
         fast_scroll {

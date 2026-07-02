@@ -24,7 +24,9 @@ manifest:
       revision: main
     - name: zmk-input-gestures
       url: https://github.com/takumibaya/zmk-input-gestures
-      revision: main
+      # fix/gesture-suppression-selfheal: suppression-latch 自己回復 + NULL raw_event_1 ガード
+      # （トラックパッド突然死＋APL固定の対策。安定確認後に main へ取り込み可）
+      revision: fix/gesture-suppression-selfheal
     - name: zmk-pointing-acceleration-alpha
       remote: nuovotaka
       revision: main
