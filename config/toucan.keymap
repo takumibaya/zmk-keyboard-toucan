@@ -81,51 +81,51 @@
             key-positions = <11 10>;
         };
 
-        combo-fast-scroll-y-down-apl {
+        combo-fast-scroll-y-main-apl {
             bindings = <&sl APL_FAST>;
             key-positions = <6 18>;
             layers = <APL>;
         };
 
-        combo-fast-scroll-y-down-ctrl {
+        combo-fast-scroll-y-thumb-apl {
+            bindings = <&sl APL_FAST>;
+            key-positions = <5 29>;
+            layers = <APL>;
+        };
+
+        combo-fast-scroll-x-main-apl {
+            bindings = <&sl APL_FAST>;
+            key-positions = <30 31>;
+            layers = <APL>;
+        };
+
+        combo-fast-scroll-x-thumb-apl {
+            bindings = <&sl APL_FAST>;
+            key-positions = <26 28>;
+            layers = <APL>;
+        };
+
+        combo-fast-scroll-y-main-ctrl {
             bindings = <&sl CTRL_FAST>;
             key-positions = <6 18>;
             layers = <CTRL>;
         };
 
-        combo-fast-scroll-y-up-apl {
-            bindings = <&sl APL_FAST>;
-            key-positions = <5 17>;
-            layers = <APL>;
-        };
-
-        combo-fast-scroll-y-up-ctrl {
+        combo-fast-scroll-y-thumb-ctrl {
             bindings = <&sl CTRL_FAST>;
             key-positions = <5 17>;
             layers = <CTRL>;
         };
 
-        combo-fast-scroll-x-left-apl {
-            bindings = <&sl APL_FAST>;
-            key-positions = <30 31>;
-            layers = <APL>;
-        };
-
-        combo-fast-scroll-x-left-ctrl {
+        combo-fast-scroll-x-main-ctrl {
             bindings = <&sl CTRL_FAST>;
-            key-positions = <30 31>;
+            key-positions = <31 33>;
             layers = <CTRL>;
         };
 
-        combo-fast-scroll-x-right-apl {
-            bindings = <&sl APL_FAST>;
-            key-positions = <29 28>;
-            layers = <APL>;
-        };
-
-        combo-fast-scroll-x-right-ctrl {
+        combo-fast-scroll-x-thumb-ctrl {
             bindings = <&sl CTRL_FAST>;
-            key-positions = <29 28>;
+            key-positions = <26 28>;
             layers = <CTRL>;
         };
     };
