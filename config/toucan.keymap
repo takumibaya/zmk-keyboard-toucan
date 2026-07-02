@@ -176,7 +176,7 @@
         fast_scroll {
             label = "FAST";
             bindings = <
-&trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(80)  &msc MOVE_Y(80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-20)  &msc MOVE_Y(-80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_X(60)  &msc MOVE_Y(-80)  &none  &msc MOVE_X(-20)  &trans  &msc MOVE_X(20)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(80)  &msc MOVE_Y(80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-20)  &msc MOVE_Y(-80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_X(60)  &msc MOVE_Y(-80)  &trans  &msc MOVE_X(-20)  &trans  &msc MOVE_X(20)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
             >;
         };
     };
