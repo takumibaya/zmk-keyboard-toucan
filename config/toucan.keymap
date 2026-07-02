@@ -80,25 +80,28 @@
             key-positions = <11 10>;
         };
 
-        combo-fast-scroll {
+        combo-fast-scroll-y-down {
             bindings = <&sl FAST_SCROLL>;
-            key-positions = <18 6>;
-            layers = <APL CTRL>;
+            key-positions = <5 6>;
+            layers = <APL>;
         };
 
-        combo-fast-scroll-l {
+        combo-fast-scroll-y-up {
             bindings = <&sl FAST_SCROLL>;
-            key-positions = <5 17>;
+            key-positions = <18 29>;
+            layers = <APL>;
         };
 
-        combo-fast-scroll-h-r {
+        combo-fast-scroll-x-left {
             bindings = <&sl FAST_SCROLL>;
-            key-positions = <31 33>;
+            key-positions = <19 26>;
+            layers = <APL>;
         };
 
-        combo-fast-scroll-h-l {
+        combo-fast-scroll-x-right {
             bindings = <&sl FAST_SCROLL>;
-            key-positions = <28 26>;
+            key-positions = <20 28>;
+            layers = <APL>;
         };
     };
 
@@ -149,7 +152,7 @@
 
         ctrl {
             bindings = <
-&trans  &trans  &kp LG(LEFT_BRACKET)  &kp LEFT_GUI  &kp LG(RIGHT_BRACKET)  &msc MOVE_Y(20)  &msc MOVE_Y(20)  &kp LG(LEFT_BRACKET)  &mmv MOVE_Y(-1200)  &kp LG(RIGHT_BRACKET)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-20)  &msc MOVE_Y(-20)  &mmv MOVE_X(-1200)  &mmv MOVE_Y(1200)  &mmv MOVE_X(1200)  &trans  &trans  &trans  &trans  &msc MOVE_X(-15)  &kp LEFT_GUI  &msc MOVE_X(15)  &mkp MCLK  &mkp LCLK  &msc MOVE_X(-15)  &mkp MCLK  &msc MOVE_X(15)  &trans  &trans  &none  &mkp RCLK  &mkp LCLK  &mkp LCLK  &mkp RCLK  &tog BASE
+&trans  &trans  &kp LG(LEFT_BRACKET)  &kp LEFT_GUI  &kp LG(RIGHT_BRACKET)  &msc MOVE_Y(20)  &msc MOVE_Y(20)  &kp LG(LEFT_BRACKET)  &mmv MOVE_Y(-1200)  &kp LG(RIGHT_BRACKET)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-20)  &msc MOVE_Y(-20)  &mmv MOVE_X(-1200)  &mmv MOVE_Y(1200)  &mmv MOVE_X(1200)  &trans  &trans  &trans  &trans  &msc MOVE_X(-15)  &kp LEFT_GUI  &msc MOVE_X(15)  &mkp MCLK  &mkp LCLK  &msc MOVE_X(-15)  &mkp MCLK  &msc MOVE_X(15)  &trans  &trans  &td_ctrl  &mkp RCLK  &mkp LCLK  &mkp LCLK  &mkp RCLK  &td_ctrl
             >;
 
             label = "CTRL";
@@ -173,7 +176,7 @@
         fast_scroll {
             label = "FAST";
             bindings = <
-&trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(80)  &msc MOVE_Y(80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_X(-60)  &trans  &msc MOVE_X(60)  &trans  &trans  &msc MOVE_X(-60)  &trans  &msc MOVE_X(60)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(80)  &msc MOVE_Y(80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-80)  &msc MOVE_X(-60)  &msc MOVE_X(60)  &trans  &trans  &trans  &trans  &trans  &msc MOVE_X(-60)  &trans  &msc MOVE_X(60)  &msc MOVE_Y(-80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
             >;
         };
     };
