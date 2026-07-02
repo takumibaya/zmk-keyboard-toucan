@@ -82,26 +82,26 @@
 
         combo-fast-scroll-y-down {
             bindings = <&sl FAST_SCROLL>;
-            key-positions = <5 6>;
-            layers = <APL>;
+            key-positions = <6 18>;
+            layers = <APL CTRL>;
         };
 
         combo-fast-scroll-y-up {
             bindings = <&sl FAST_SCROLL>;
-            key-positions = <18 29>;
-            layers = <APL>;
+            key-positions = <5 17>;
+            layers = <APL CTRL>;
         };
 
         combo-fast-scroll-x-left {
             bindings = <&sl FAST_SCROLL>;
-            key-positions = <19 26>;
-            layers = <APL>;
+            key-positions = <19 18>;
+            layers = <APL CTRL>;
         };
 
         combo-fast-scroll-x-right {
             bindings = <&sl FAST_SCROLL>;
-            key-positions = <20 28>;
-            layers = <APL>;
+            key-positions = <16 17>;
+            layers = <APL CTRL>;
         };
     };
 
