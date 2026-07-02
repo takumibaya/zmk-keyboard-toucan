@@ -12,7 +12,8 @@
 #define CTRL        5
 #define ADJ         6
 #define SET         7
-#define FAST_SCROLL 8
+#define APL_FAST    8
+#define CTRL_FAST   9
 
 // quick-tap-ms: 二度押し時にタップキーが連続入力される設定
 
@@ -80,28 +81,52 @@
             key-positions = <11 10>;
         };
 
-        combo-fast-scroll-y-down {
-            bindings = <&sl FAST_SCROLL>;
+        combo-fast-scroll-y-down-apl {
+            bindings = <&sl APL_FAST>;
             key-positions = <6 18>;
-            layers = <APL CTRL>;
+            layers = <APL>;
         };
 
-        combo-fast-scroll-y-up {
-            bindings = <&sl FAST_SCROLL>;
+        combo-fast-scroll-y-down-ctrl {
+            bindings = <&sl CTRL_FAST>;
+            key-positions = <6 18>;
+            layers = <CTRL>;
+        };
+
+        combo-fast-scroll-y-up-apl {
+            bindings = <&sl APL_FAST>;
             key-positions = <5 17>;
-            layers = <APL CTRL>;
+            layers = <APL>;
         };
 
-        combo-fast-scroll-x-left {
-            bindings = <&sl FAST_SCROLL>;
+        combo-fast-scroll-y-up-ctrl {
+            bindings = <&sl CTRL_FAST>;
+            key-positions = <5 17>;
+            layers = <CTRL>;
+        };
+
+        combo-fast-scroll-x-left-apl {
+            bindings = <&sl APL_FAST>;
             key-positions = <30 31>;
-            layers = <APL CTRL>;
+            layers = <APL>;
         };
 
-        combo-fast-scroll-x-right {
-            bindings = <&sl FAST_SCROLL>;
+        combo-fast-scroll-x-left-ctrl {
+            bindings = <&sl CTRL_FAST>;
+            key-positions = <30 31>;
+            layers = <CTRL>;
+        };
+
+        combo-fast-scroll-x-right-apl {
+            bindings = <&sl APL_FAST>;
             key-positions = <29 28>;
-            layers = <APL CTRL>;
+            layers = <APL>;
+        };
+
+        combo-fast-scroll-x-right-ctrl {
+            bindings = <&sl CTRL_FAST>;
+            key-positions = <29 28>;
+            layers = <CTRL>;
         };
     };
 
@@ -178,11 +203,19 @@
             label = "SET";
         };
 
-        fast_scroll {
-            display-name = "FAST";
-            label = "FAST";
+        apl_fast {
+            display-name = "APLF";
+            label = "APLF";
             bindings = <
-&trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(80)  &msc MOVE_Y(80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-20)  &msc MOVE_Y(-80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_X(80)  &msc MOVE_Y(-80)  &trans  &msc MOVE_X(-80)  &trans  &msc MOVE_X(80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(80)  &msc MOVE_Y(80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_X(-80)  &trans  &msc MOVE_X(80)  &msc MOVE_Y(-80)  &msc MOVE_X(-80)  &msc MOVE_X(80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+            >;
+        };
+
+        ctrl_fast {
+            display-name = "CTLF";
+            label = "CTLF";
+            bindings = <
+&trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(80)  &msc MOVE_Y(80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_Y(-80)  &msc MOVE_Y(-80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &msc MOVE_X(-80)  &trans  &msc MOVE_X(80)  &trans  &trans  &msc MOVE_X(-80)  &trans  &msc MOVE_X(80)  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
             >;
         };
     };
