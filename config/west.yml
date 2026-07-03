@@ -29,9 +29,9 @@ manifest:
       revision: fix/gesture-suppression-selfheal
     - name: zmk-input-processors
       url: https://github.com/halfdane/zmk-input-processors
-      # 4eec169: absolute-to-relative processor without USB HID dependency.
-      # main currently depends on USB_DEVICE_HID, which would not be safe for BLE-only builds.
-      revision: 4eec16906a680465561abbcd15f93d29ea7e7117
+      # 7d18ba7: defines a valid Zephyr init priority for absolute-to-relative.
+      # Earlier 4eec169 links on right but fails the left build with an undefined init level.
+      revision: 7d18ba7af91e485bbd9febda150505fb38ce6d8a
     - name: zmk-pointing-acceleration-alpha
       remote: nuovotaka
       revision: main
