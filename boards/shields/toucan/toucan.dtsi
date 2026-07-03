@@ -3,6 +3,7 @@
 #include <dt-bindings/zmk/matrix_transform.h>
 #include <physical_layouts.dtsi>
 #include <behaviors/input_processor_gestures.dtsi>
+#include <behaviors/input_processor_absolute_to_relative.dtsi>
 #include <dt-bindings/input/input-event-codes.h>
 #include <behaviors/input_gestures_accel.dtsi>
 
@@ -111,6 +112,8 @@
         status = "disabled";
         device = <&glidepoint_split>;
         input-processors = <
+            &zip_gestures
+            &zip_absolute_to_relative
             &touch_processor
             &pointer_accel
             &zip_xy_scaler 3 4

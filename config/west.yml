@@ -27,6 +27,11 @@ manifest:
       # fix/gesture-suppression-selfheal: suppression-latch 自己回復 + NULL raw_event_1 ガード
       # （トラックパッド突然死＋APL固定の対策。安定確認後に main へ取り込み可）
       revision: fix/gesture-suppression-selfheal
+    - name: zmk-input-processors
+      url: https://github.com/halfdane/zmk-input-processors
+      # 4eec169: absolute-to-relative processor without USB HID dependency.
+      # main currently depends on USB_DEVICE_HID, which would not be safe for BLE-only builds.
+      revision: 4eec16906a680465561abbcd15f93d29ea7e7117
     - name: zmk-pointing-acceleration-alpha
       remote: nuovotaka
       revision: main
