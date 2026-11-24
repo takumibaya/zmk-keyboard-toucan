@@ -10,8 +10,12 @@
  * Tap: a touch that lasts at most tap_ms (BTN_TOUCH press to release on the left's clock) and
  * moves at most tap_move (accumulated |dx|+|dy| before acceleration) invokes the click binding:
  * press, click-ms, release, on the system work queue. The cursor moves normally meanwhile. A
- * trackpad button edge, a malformed aux event, or a parameter or key change during the touch
- * cancels the click.
+ * trackpad button edge, a malformed aux event, or a parameter change (Studio or the &tgs key)
+ * during the touch cancels the click.
+ *
+ * Parameters: the ones in effect (`live`) and the stored ones (`saved`, settings key tcn/gst)
+ * change only under params_mutex, from the Studio RPC thread or the key. &tgs only flips the
+ * on/off flags, in effect and stored at once, so Studio always shows what the key did.
  *
  * Fail-open: when a gesturing touch gets no source event for contact-timeout-ms, it stops
  * gesturing, a forwarded BTN_TOUCH press is released once the way the right half ends a touch
@@ -43,7 +47,7 @@
 LOG_MODULE_REGISTER(toucan_gestures, CONFIG_ZMK_LOG_LEVEL);
 
 BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(DT_DRV_COMPAT) == 1,
-             "one toucan,input-gestures node: its parameters and key are global");
+             "one toucan,input-gestures node: its parameters are global");
 
 #define NODE DT_DRV_INST(0)
 #define SELF DEVICE_DT_GET(NODE)
@@ -81,10 +85,13 @@ BUILD_ASSERT(!DT_PROP(NODE, rim), "rim scroll is not built");
 static const struct tcn_gesture_params dt_defaults = DT_DEFAULTS;
 static const struct zmk_behavior_binding click_binding = ZMK_KEYMAP_EXTRACT_BINDING(0, NODE);
 
-/* Written by the RPC and the key, picked up by the input thread in refresh(). */
+/* Written under params_mutex by the RPC and the key; the input thread copies `live` in
+ * refresh() under the spinlock (it never takes the mutex, which may be held during a flash
+ * write). */
+static K_MUTEX_DEFINE(params_mutex);
 static struct k_spinlock lock;
 static struct tcn_gesture_params live = DT_DEFAULTS;
-static bool key_off;
+static struct tcn_gesture_params saved = DT_DEFAULTS;
 static atomic_t generation = ATOMIC_INIT(1);
 static atomic_t aux_seen;
 
@@ -92,7 +99,7 @@ static atomic_t aux_seen;
 static struct {
     struct tcn_gesture_params cfg; /* snapshot of `live` */
     atomic_val_t generation;
-    bool on;           /* the key is on and a gesture is enabled */
+    bool on;           /* a gesture is enabled */
     bool touch;        /* a forwarded BTN_TOUCH press waits for its release */
     bool drop_release; /* fail-open released `touch`; drop its late real release */
     bool armed;        /* this touch is gesturing */
@@ -181,7 +188,7 @@ static void refresh(void) {
     }
     k_spinlock_key_t key = k_spin_lock(&lock);
     st.cfg = live;
-    st.on = !key_off && st.cfg.tap;
+    st.on = st.cfg.tap;
     k_spin_unlock(&lock, key);
     st.generation = gen;
     if (st.armed) {
@@ -313,114 +320,166 @@ static void source_event(struct input_event *evt) {
 
 INPUT_CALLBACK_DEFINE(SOURCE, source_event);
 
-/* ---------------------------------------------------------------- parameters and key */
+/* ---------------------------------------------------------------- parameters (params_mutex) */
 
-void tcn_gestures_defaults(struct tcn_gesture_params *params) { *params = dt_defaults; }
+#define GESTURE_RECORD_VERSION 1
 
-void tcn_gestures_get(struct tcn_gesture_params *params) {
-    k_spinlock_key_t key = k_spin_lock(&lock);
-    *params = live;
-    k_spin_unlock(&lock, key);
+struct gesture_record {
+    uint16_t version;
+    struct tcn_gesture_params params;
+};
+
+BUILD_ASSERT(sizeof(struct gesture_record) == 12, "gesture record layout (version 1) changed");
+
+bool tcn_gestures_params_equal(const struct tcn_gesture_params *a,
+                               const struct tcn_gesture_params *b) {
+    return a->tap == b->tap && a->tap_ms == b->tap_ms && a->tap_move == b->tap_move &&
+           a->rim == b->rim && a->rim_width == b->rim_width &&
+           a->rim_start_deg == b->rim_start_deg && a->rim_steps == b->rim_steps &&
+           a->rim_reverse == b->rim_reverse;
 }
 
-void tcn_gestures_set(const struct tcn_gesture_params *params) {
+static void set_live(const struct tcn_gesture_params *params) {
     k_spinlock_key_t key = k_spin_lock(&lock);
     live = *params;
     k_spin_unlock(&lock, key);
     atomic_inc(&generation);
 }
 
+static struct tcn_gesture_params get_live(void) {
+    k_spinlock_key_t key = k_spin_lock(&lock);
+    const struct tcn_gesture_params params = live;
+    k_spin_unlock(&lock, key);
+    return params;
+}
+
+static int store(const struct tcn_gesture_params *params) {
+#if IS_ENABLED(CONFIG_SETTINGS)
+    const struct gesture_record record = {.version = GESTURE_RECORD_VERSION, .params = *params};
+    int err = settings_save_one(TOUCAN_SETTINGS_GESTURE, &record, sizeof(record));
+    if (err) {
+        return err;
+    }
+#endif
+    saved = *params;
+    return 0;
+}
+
+void tcn_gestures_defaults(struct tcn_gesture_params *params) { *params = dt_defaults; }
+
+void tcn_gestures_get(struct tcn_gesture_params *current, struct tcn_gesture_params *stored) {
+    k_mutex_lock(&params_mutex, K_FOREVER);
+    *current = get_live();
+    *stored = saved;
+    k_mutex_unlock(&params_mutex);
+}
+
+void tcn_gestures_set(const struct tcn_gesture_params *params) {
+    k_mutex_lock(&params_mutex, K_FOREVER);
+    set_live(params);
+    k_mutex_unlock(&params_mutex);
+}
+
+int tcn_gestures_save(void) {
+    k_mutex_lock(&params_mutex, K_FOREVER);
+    const struct tcn_gesture_params current = get_live();
+    int err = tcn_gestures_params_equal(&current, &saved) ? 0 : store(&current);
+    k_mutex_unlock(&params_mutex);
+    return err;
+}
+
+void tcn_gestures_discard(void) {
+    k_mutex_lock(&params_mutex, K_FOREVER);
+    set_live(&saved);
+    k_mutex_unlock(&params_mutex);
+}
+
+int tcn_gestures_restore_defaults(void) {
+    int err = 0;
+    k_mutex_lock(&params_mutex, K_FOREVER);
+#if IS_ENABLED(CONFIG_SETTINGS)
+    err = settings_delete(TOUCAN_SETTINGS_GESTURE);
+#endif
+    if (!err) {
+        saved = dt_defaults;
+        set_live(&dt_defaults);
+    }
+    k_mutex_unlock(&params_mutex);
+    return err;
+}
+
+int tcn_gestures_switch(uint32_t op) {
+    k_mutex_lock(&params_mutex, K_FOREVER);
+    struct tcn_gesture_params current = get_live();
+    bool on;
+    switch (op) {
+    case TGS_TOG:
+        on = !(current.tap || current.rim);
+        break;
+    case TGS_ON:
+        on = true;
+        break;
+    case TGS_OFF:
+        on = false;
+        break;
+    default:
+        k_mutex_unlock(&params_mutex);
+        return -EINVAL;
+    }
+    current.tap = on;
+    current.rim = on && tcn_gestures_rim_available();
+    struct tcn_gesture_params stored = saved;
+    stored.tap = current.tap;
+    stored.rim = current.rim;
+    set_live(&current);
+    int err = tcn_gestures_params_equal(&stored, &saved) ? 0 : store(&stored);
+    k_mutex_unlock(&params_mutex);
+    LOG_INF("Touch gestures %s by key", on ? "on" : "off");
+    if (err) {
+        LOG_ERR("Storing the gesture settings failed: %d", err);
+    }
+    return err;
+}
+
 bool tcn_gestures_rim_available(void) { return false; }
 
 bool tcn_gestures_rim_samples_seen(void) { return atomic_get(&aux_seen) != 0; }
 
-bool tcn_gestures_switched_off(void) {
-    k_spinlock_key_t key = k_spin_lock(&lock);
-    const bool off = key_off;
-    k_spin_unlock(&lock, key);
-    return off;
-}
-
-static void set_key_off(bool off) {
-    k_spinlock_key_t key = k_spin_lock(&lock);
-    key_off = off;
-    k_spin_unlock(&lock, key);
-    atomic_inc(&generation);
-}
-
-#define SWITCH_RECORD_VERSION 1
-
-struct switch_record {
-    uint8_t version;
-    uint8_t off;
-};
-
-static void switch_save_cb(struct k_work *work) {
 #if IS_ENABLED(CONFIG_SETTINGS)
-    const struct switch_record record = {.version = SWITCH_RECORD_VERSION,
-                                         .off = tcn_gestures_switched_off()};
-    int err = record.off ? settings_save_one(TOUCAN_SETTINGS_GESTURE_SWITCH, &record,
-                                             sizeof(record))
-                         : settings_delete(TOUCAN_SETTINGS_GESTURE_SWITCH);
-    if (err) {
-        LOG_ERR("Storing the gesture key state failed: %d", err);
-    }
-#endif
+static bool in_range(uint32_t value, uint32_t min, uint32_t max) {
+    return value >= min && value <= max;
 }
 
-static K_WORK_DEFINE(switch_save_work, switch_save_cb);
-
-int tcn_gestures_switch(uint32_t op) {
-    k_spinlock_key_t key = k_spin_lock(&lock);
-    switch (op) {
-    case TGS_TOG:
-        key_off = !key_off;
-        break;
-    case TGS_ON:
-        key_off = false;
-        break;
-    case TGS_OFF:
-        key_off = true;
-        break;
-    default:
-        k_spin_unlock(&lock, key);
-        return -EINVAL;
-    }
-    const bool off = key_off;
-    k_spin_unlock(&lock, key);
-    atomic_inc(&generation);
-    LOG_INF("Touch gestures %s by key", off ? "off" : "on");
-    k_work_submit(&switch_save_work);
-    return 0;
-}
-
-int tcn_gestures_switch_reset(void) {
-    set_key_off(false);
-#if IS_ENABLED(CONFIG_SETTINGS)
-    return settings_delete(TOUCAN_SETTINGS_GESTURE_SWITCH);
-#else
-    return 0;
-#endif
-}
-
-#if IS_ENABLED(CONFIG_SETTINGS)
-static int switch_settings_set(const char *name, size_t len, settings_read_cb read_cb,
-                               void *cb_arg) {
+static int load_params(const char *name, size_t len, settings_read_cb read_cb, void *cb_arg) {
     if (name && *name) {
         return -ENOENT;
     }
-    struct switch_record record;
+    struct gesture_record record;
     if (len != sizeof(record) || read_cb(cb_arg, &record, sizeof(record)) != sizeof(record) ||
-        record.version != SWITCH_RECORD_VERSION) {
-        LOG_WRN("Ignoring malformed or unsupported gesture key record");
+        record.version != GESTURE_RECORD_VERSION) {
+        LOG_WRN("Ignoring malformed or unsupported gesture settings record");
         return 0;
     }
-    set_key_off(record.off != 0);
+#define CHECK(field, lo, hi)                                                                       \
+    if (!in_range(record.params.field, lo, hi)) {                                                  \
+        LOG_WRN("Ignoring gesture settings: invalid " #field);                                     \
+        return 0;                                                                                  \
+    }
+    TCN_GESTURE_TAP_RANGES(CHECK)
+    TCN_GESTURE_RIM_RANGES(CHECK)
+#undef CHECK
+    if (record.params.rim && !tcn_gestures_rim_available()) {
+        LOG_WRN("Stored rim scroll is not built here; loading the rest");
+        record.params.rim = false;
+    }
+    k_mutex_lock(&params_mutex, K_FOREVER);
+    saved = record.params;
+    set_live(&record.params);
+    k_mutex_unlock(&params_mutex);
     return 0;
 }
 
-SETTINGS_STATIC_HANDLER_DEFINE(tcn_gsw, TOUCAN_SETTINGS_GESTURE_SWITCH, NULL, switch_settings_set,
-                               NULL, NULL);
+SETTINGS_STATIC_HANDLER_DEFINE(tcn_gst, TOUCAN_SETTINGS_GESTURE, NULL, load_params, NULL, NULL);
 #endif
 
 DEVICE_DT_INST_DEFINE(0, NULL, NULL, NULL, NULL, POST_KERNEL,

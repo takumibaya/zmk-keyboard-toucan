@@ -1,6 +1,7 @@
 /*
- * &tgs: on/off key of the touch gestures (param1 TGS_TOG / TGS_ON / TGS_OFF). The state
- * overrides the Studio settings and is kept across reboots; see src/touch_gestures.c.
+ * &tgs: on/off key of the touch gestures (param1 TGS_TOG / TGS_ON / TGS_OFF). It turns every
+ * built gesture on or off in the Studio settings and stores that at once; see
+ * tcn_gestures_switch() in src/touch_gestures.c.
  *
  * SPDX-License-Identifier: MIT
  */

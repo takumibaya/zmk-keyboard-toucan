@@ -48,8 +48,8 @@ nice_view_spi: &spi0 {
 };
 
 / {
-    // Tap-to-click between the right half's trackpad and the listener (off by default; Studio
-    // turns it on, &tgs turns it off). Forwards everything else unchanged.
+    // Tap-to-click between the right half's trackpad and the listener (off by default; Studio or
+    // the &tgs key, SET + G, turn it on and off). Forwards everything else unchanged.
     tcn_gestures: tcn_gestures {
         compatible = "toucan,input-gestures";
         device = <&glidepoint_split>;

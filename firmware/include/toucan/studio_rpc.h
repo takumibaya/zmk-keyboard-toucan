@@ -22,11 +22,10 @@
 
 #define TOUCAN_STUDIO_PROTOCOL_VERSION 3
 
-/* Settings subtrees (Zephyr settings) owned by the features. */
+/* Settings subtrees (Zephyr settings) owned by the features (touch gestures: toucan/touch_gestures.h). */
 #define TOUCAN_SETTINGS_COMBO "tcn/cmb"   /* tcn/cmb/<slot> */
 #define TOUCAN_SETTINGS_MACRO "tcn/mac"   /* tcn/mac/<slot> */
 #define TOUCAN_SETTINGS_POINTER "tcn/ptr" /* single record */
-#define TOUCAN_SETTINGS_GESTURE "tcn/gst" /* single record; the on/off key uses "tcn/gsw" */
 
 /* Fill resp with an Error result. */
 void tcn_rpc_error(toucan_studio_Response *resp, toucan_studio_ErrorCode code, uint8_t field,
@@ -78,5 +77,5 @@ void tcn_gesture_set(const toucan_studio_SetTouchGestureRequest *req, toucan_stu
 bool tcn_gesture_unsaved(void);
 int tcn_gesture_save(void);
 int tcn_gesture_discard(void);
-int tcn_gesture_restore_defaults(void); /* DT values in RAM, stored record erased, key back on */
+int tcn_gesture_restore_defaults(void); /* DT values in effect and stored, record erased */
 #endif

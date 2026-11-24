@@ -13,7 +13,7 @@
  */
 #define TOUCAN_AUX_ABS_CODE 0x7F00
 
-/* &tgs (touch gesture on/off key) parameter. */
+/* &tgs (touch gesture on/off key) parameter: toggle, every built gesture on, all off. */
 #define TGS_TOG 0
 #define TGS_ON 1
 #define TGS_OFF 2

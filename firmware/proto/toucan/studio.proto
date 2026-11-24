@@ -331,7 +331,7 @@ message TouchGestureInfo {
   Range rim_width = 5;            // set when rim
   Range rim_start_deg = 6;        // set when rim
   Range rim_steps = 7;            // set when rim
-  uint32 switch_behavior_id = 8;  // local id of the on/off behavior; param1 0 = toggle, 1 = on, 2 = off
+  uint32 switch_behavior_id = 8;  // local id of the on/off behavior (&tgs), see TouchGestures
 }
 
 // One complete set of gesture settings. Both gestures are off by default.
@@ -348,13 +348,14 @@ message TouchGestureParams {
   bool rim_reverse = 8;      // false: clockwise scrolls down, true: clockwise scrolls up
 }
 
+// The on/off key (&tgs, param1 0 = toggle, 1 = on, 2 = off) changes only `tap` and `rim`: on sets
+// every built gesture, off clears both, toggle turns all off when any is on. It changes them in
+// `current` and `saved` and stores them right away, so other unsaved edits stay unsaved.
 message TouchGestures {
   TouchGestureParams current = 1;  // in effect (RAM)
   TouchGestureParams saved = 2;    // stored values, or the DT defaults when nothing is stored
   bool unsaved = 3;
-  bool switched_off = 4;           // the on/off key turned the gestures off; overrides `current` and
-                                   // is kept across reboots (not part of save/discard)
-  bool rim_samples_seen = 5;       // the latest touch (current or last) carried the right half's
+  bool rim_samples_seen = 4;       // the latest touch (current or last) carried the right half's
                                    // aux coordinates; says nothing about the right's firmware version
 }
 

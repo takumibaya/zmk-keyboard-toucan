@@ -1,9 +1,9 @@
 /*
- * Touch gestures of the left half (src/touch_gestures.c): parameters, the on/off key state
- * and the diagnostics that the Studio RPC (src/gesture_rpc.c) reads and replaces.
+ * Touch gestures of the left half (src/touch_gestures.c): parameters, their stored copy and
+ * the diagnostics that the Studio RPC (src/gesture_rpc.c) and the on/off key (&tgs) use.
  *
- * Parameters and the key state may change from any thread; the input thread picks the change
- * up with the next trackpad event, and a touch in progress then stops gesturing.
+ * Parameters may change from any thread; the input thread picks a change up with the next
+ * trackpad event, and a touch in progress then stops gesturing.
  *
  * SPDX-License-Identifier: MIT
  */
@@ -13,8 +13,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-/* Settings key of the on/off key state (absent = on). */
-#define TOUCAN_SETTINGS_GESTURE_SWITCH "tcn/gsw"
+/* Settings key of the stored parameters (one versioned record). */
+#define TOUCAN_SETTINGS_GESTURE "tcn/gst"
 
 /* name, min, max of the numeric parameters (TouchGestureParams; also checked for DT defaults). */
 #define TCN_GESTURE_TAP_RANGES(X) X(tap_ms, 60, 350) X(tap_move, 0, 255)
@@ -32,27 +32,35 @@ struct tcn_gesture_params {
     bool rim_reverse; /* false: clockwise scrolls down */
 };
 
+bool tcn_gestures_params_equal(const struct tcn_gesture_params *a,
+                               const struct tcn_gesture_params *b);
+
 /* The keymap DT values (also the result of restore_defaults). */
 void tcn_gestures_defaults(struct tcn_gesture_params *params);
 
-/* The parameters in effect. */
-void tcn_gestures_get(struct tcn_gesture_params *params);
+/* The parameters in effect and the stored ones (DT values while nothing is stored). */
+void tcn_gestures_get(struct tcn_gesture_params *current, struct tcn_gesture_params *saved);
 
-/* Replace the parameters in effect; the caller has validated them. */
+/* Replace the parameters in effect (RAM only); the caller has validated them. */
 void tcn_gestures_set(const struct tcn_gesture_params *params);
+
+/* Store the parameters in effect. */
+int tcn_gestures_save(void);
+
+/* Put the stored parameters back in effect. */
+void tcn_gestures_discard(void);
+
+/* DT values in effect and stored (the record is erased). */
+int tcn_gestures_restore_defaults(void);
+
+/* On/off key: TGS_ON turns every built gesture on, TGS_OFF turns all off, TGS_TOG turns all off
+ * when any is on and on otherwise (dt-bindings/toucan/touch_gestures.h). Only the on/off flags
+ * change, in effect and stored (written right away); the other parameters and any other unsaved
+ * change stay as they are. Returns -EINVAL for an unknown op or the settings error. */
+int tcn_gestures_switch(uint32_t op);
 
 /* Rim scroll is built (aux coordinates and a wheel output are configured). */
 bool tcn_gestures_rim_available(void);
 
 /* The latest touch (current or last) carried aux coordinates from the right half. */
 bool tcn_gestures_rim_samples_seen(void);
-
-/* The on/off key has turned the gestures off. */
-bool tcn_gestures_switched_off(void);
-
-/* On/off key: TGS_TOG / TGS_ON / TGS_OFF (dt-bindings/toucan/touch_gestures.h). The state is
- * stored right away so it survives a reboot. Returns -EINVAL for an unknown op. */
-int tcn_gestures_switch(uint32_t op);
-
-/* Turn the key state back on and erase it from the settings (restore_defaults, official reset). */
-int tcn_gestures_switch_reset(void);

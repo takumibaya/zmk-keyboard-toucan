@@ -74,7 +74,7 @@ config TOUCAN_STUDIO_GESTURE
     depends on SETTINGS && ZMK_BEHAVIOR_LOCAL_IDS
     help
       Tap-to-click (and rim scroll) parameters with save / discard /
-      restore, and the state of the on/off key.
+      restore. The &tgs key changes the same on/off flags.
 
 endif # TOUCAN_STUDIO
 
