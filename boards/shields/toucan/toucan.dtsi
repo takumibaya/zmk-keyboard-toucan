@@ -124,11 +124,6 @@
                 &zip_scroll_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)
             >;
         };
-
-        base {
-            layers = <0>;
-            input-processors = <&touch_processor>;
-        };
     };
 
     input_processors {
