@@ -1,0 +1,25 @@
+/* SPDX-License-Identifier: MIT */
+
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
+/ {
+    /omit-if-no-ref/ tcn_xy_scale: tcn_xy_scale {
+        compatible = "toucan,input-processor-runtime-scaler";
+        #input-processor-cells = <0>;
+        type = <INPUT_EV_REL>;
+        codes = <INPUT_REL_X INPUT_REL_Y>;
+        track-remainders;
+        default-mul = <3>;
+        default-div = <4>;
+    };
+
+    /omit-if-no-ref/ tcn_scroll_scale: tcn_scroll_scale {
+        compatible = "toucan,input-processor-runtime-scaler";
+        #input-processor-cells = <0>;
+        type = <INPUT_EV_REL>;
+        codes = <INPUT_REL_WHEEL INPUT_REL_HWHEEL>;
+        track-remainders;
+        default-mul = <1>;
+        default-div = <7>;
+    };
+};

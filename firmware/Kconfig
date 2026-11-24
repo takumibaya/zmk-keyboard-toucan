@@ -63,6 +63,7 @@ config TOUCAN_STUDIO_POINTER
     bool "Runtime pointer settings over toucan__studio"
     default y
     depends on ZMK_POINTING
+    depends on !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
     help
       Acceleration parameters (zmk-pointing-acceleration-alpha fork) and
       the cursor / scroll multipliers of the runtime scalers.

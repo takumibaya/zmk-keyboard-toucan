@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: MIT
+
+description: Input processor with a runtime-adjustable scale ratio
+compatible: "toucan,input-processor-runtime-scaler"
+include: ip_zero_param.yaml
+
+properties:
+  type:
+    type: int
+    required: true
+  codes:
+    type: array
+    required: true
+  default-mul:
+    type: int
+    required: true
+  default-div:
+    type: int
+    required: true
