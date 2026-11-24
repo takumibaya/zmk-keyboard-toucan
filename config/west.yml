@@ -8,15 +8,13 @@ manifest:
       url-base: https://github.com/takumibaya
     - name: caksoylar
       url-base: https://github.com/caksoylar
-    - name: nuovotaka
-      url-base: https://github.com/nuovotaka
   projects:
     - name: zmk
       # 公式 v0.3 + cormoran の custom RPC (studio tag 100) + RPC 通信修正2件
-      # (branch toucan/v0.3-custom-rpc)。zmk-studio-messages は fork 側の app/west.yml で
-      # cormoran@89b81d2 に固定している。
+      # (toucan/v0.3-custom-rpc) + 実行時 combo (toucan/v0.3-runtime-combo)。
+      # zmk-studio-messages は fork 側の app/west.yml で cormoran@89b81d2 に固定している。
       remote: takumibaya
-      revision: ed1f9a5971668ccea3ba25c3c598c0bc483bf8f9
+      revision: 5419eb5cb6ee77790e91f4470f00f68a2d119c2d
       import: app/west.yml
     - name: cirque-input-module
       url: https://github.com/takumibaya/cirque-input-module
@@ -30,7 +28,8 @@ manifest:
       # （トラックパッド突然死＋APL固定の対策。安定確認後に main へ取り込み可）
       revision: fix/gesture-suppression-selfheal
     - name: zmk-pointing-acceleration-alpha
-      remote: nuovotaka
-      revision: bbf923916661c74eddc72b3db40b0dd1e3e43fec # v0.3.1。main 追従をやめて固定
+      # nuovotaka v0.3.1 (bbf9239) + 検証付きの実行時 setter (toucan/runtime-config)
+      remote: takumibaya
+      revision: 10e48ce4e487a64f157109a5e4826678401b5619
   self:
     path: config
