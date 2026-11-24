@@ -17,6 +17,8 @@ config TOUCAN_STUDIO_COMBO
     bool "Runtime combos over toucan__studio"
     default y
     depends on ZMK_COMBOS_RUNTIME
+    depends on SETTINGS && ZMK_BEHAVIOR_LOCAL_IDS && ZMK_BEHAVIOR_METADATA
+    select CRC
     help
       List / set / delete / restore combos at runtime. Needs the runtime
       combo engine of the zmk fork (CONFIG_ZMK_COMBOS_RUNTIME).
