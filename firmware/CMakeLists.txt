@@ -2,6 +2,8 @@
 # zephyr/module.yml). Nanopb generation follows cormoran's
 # zmk-module-template-with-custom-studio-rpc (v0.3-branch).
 
+target_include_directories(app PRIVATE include)
+
 if(CONFIG_TOUCAN_STUDIO)
   list(APPEND CMAKE_MODULE_PATH ${ZEPHYR_BASE}/modules/nanopb)
   include(nanopb)
@@ -16,7 +18,14 @@ if(CONFIG_TOUCAN_STUDIO)
   target_include_directories(toucan_studio_proto PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
   target_sources(toucan_studio_proto PRIVATE ${proto_srcs} ${proto_hdrs})
 
-  target_include_directories(app PRIVATE ${CMAKE_CURRENT_BINARY_DIR} include)
+  target_include_directories(app PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
   add_dependencies(app toucan_studio_proto)
   target_sources(app PRIVATE src/studio_rpc.c)
+
+  target_sources_ifdef(CONFIG_TOUCAN_STUDIO_COMBO app PRIVATE src/combo_rpc.c)
+  target_sources_ifdef(CONFIG_TOUCAN_STUDIO_MACRO app PRIVATE src/macro_rpc.c)
+  target_sources_ifdef(CONFIG_TOUCAN_STUDIO_POINTER app PRIVATE src/pointer_rpc.c)
 endif()
+
+target_sources_ifdef(CONFIG_TOUCAN_BEHAVIOR_RUNTIME_MACRO app PRIVATE src/behavior_runtime_macro.c)
+target_sources_ifdef(CONFIG_TOUCAN_INPUT_PROCESSOR_RUNTIME_SCALER app PRIVATE src/runtime_scaler.c)

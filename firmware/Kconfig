@@ -1,6 +1,6 @@
 # Toucan firmware module. The repository root is the Zephyr module
-# (zephyr/module.yml); everything here builds only on the Studio-enabled
-# left half (central).
+# (zephyr/module.yml); everything here builds only on the left half
+# (central). The right half (peripheral) stays unchanged.
 
 menuconfig TOUCAN_STUDIO
     bool "Toucan Studio custom RPC (toucan__studio)"
@@ -10,3 +10,64 @@ menuconfig TOUCAN_STUDIO
       Registers the custom Studio RPC subsystem "toucan__studio"
       (protocol: firmware/proto/toucan/studio.proto). Requires the
       takumibaya/zmk fork with the custom RPC subsystem.
+
+if TOUCAN_STUDIO
+
+config TOUCAN_STUDIO_COMBO
+    bool "Runtime combos over toucan__studio"
+    default y
+    depends on ZMK_COMBOS_RUNTIME
+    help
+      List / set / delete / restore combos at runtime. Needs the runtime
+      combo engine of the zmk fork (CONFIG_ZMK_COMBOS_RUNTIME).
+
+config TOUCAN_STUDIO_MACRO
+    bool "Runtime macros (&rtm) over toucan__studio"
+    default y
+
+if TOUCAN_STUDIO_MACRO
+
+config TOUCAN_STUDIO_MACRO_SLOTS
+    int "Runtime macro slots"
+    default 8
+    range 1 8
+
+config TOUCAN_STUDIO_MACRO_MAX_STEPS
+    int "Steps per runtime macro"
+    default 32
+    range 1 32
+
+config TOUCAN_STUDIO_MACRO_MAX_QUEUE_ITEMS
+    int "Behavior queue items one macro may use (TAP = 2, other actions = 1)"
+    default 60
+    help
+      Keep this below the behavior queue size (CONFIG_ZMK_BEHAVIORS_QUEUE_SIZE,
+      64 by default) so a macro never overflows the queue.
+
+endif # TOUCAN_STUDIO_MACRO
+
+config TOUCAN_STUDIO_POINTER
+    bool "Runtime pointer settings over toucan__studio"
+    default y
+    depends on ZMK_POINTING
+    help
+      Acceleration parameters (zmk-pointing-acceleration-alpha fork) and
+      the cursor / scroll multipliers of the runtime scalers.
+
+endif # TOUCAN_STUDIO
+
+config TOUCAN_BEHAVIOR_RUNTIME_MACRO
+    bool
+    default y
+    depends on DT_HAS_TOUCAN_BEHAVIOR_RUNTIME_MACRO_ENABLED
+    depends on TOUCAN_STUDIO_MACRO
+
+config TOUCAN_INPUT_PROCESSOR_RUNTIME_SCALER
+    bool
+    default y
+    depends on DT_HAS_TOUCAN_INPUT_PROCESSOR_RUNTIME_SCALER_ENABLED
+    depends on ZMK_POINTING
+    depends on !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
+    help
+      Needed whenever the input listener references the runtime scalers
+      (also without Studio), so it does not depend on TOUCAN_STUDIO.
