@@ -18,7 +18,9 @@ manifest:
       import: app/west.yml
     - name: cirque-input-module
       url: https://github.com/takumibaya/cirque-input-module
-      revision: fix/interrupt-deadlock-recovery
+      # toucan/aux-abs = fix/interrupt-deadlock-recovery (dbba66c) + 任意の補助絶対座標
+      # (aux-abs-code)。右 overlay で有効化し、左の外周スクロールが使う。
+      revision: e05b3762f981514d1f75faa4df11b0672f881dbc
     - name: zmk-rgbled-widget
       remote: caksoylar
       revision: e6b467792a1dabef8cfa5c9fd26bfefc9c16662b # main@2026-07-09。再現性のため固定

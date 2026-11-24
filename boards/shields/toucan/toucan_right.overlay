@@ -1,6 +1,7 @@
 #include "toucan.dtsi"
 #include <input/processors.dtsi>
 #include <dt-bindings/zmk/input_transform.h>
+#include <dt-bindings/toucan/touch_gestures.h>
 
 &xiao_i2c {
     status = "disabled";
@@ -66,6 +67,10 @@
         abs-rel-divisor = <1>;
         x-invert;
         y-invert;
+        // Rim scroll on the left: after each touching sample's unchanged REL frame, send
+        // its 0..1024 position once (first sample of a contact always, then every 20 ms).
+        aux-abs-code = <TOUCAN_AUX_ABS_CODE>;
+        aux-abs-interval-ms = <20>;
         // sleep;
     };
 };
