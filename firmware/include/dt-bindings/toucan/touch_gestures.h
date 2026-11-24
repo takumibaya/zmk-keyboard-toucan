@@ -12,3 +12,8 @@
  * no standard ABS code and no ZMK listener uses it.
  */
 #define TOUCAN_AUX_ABS_CODE 0x7F00
+
+/* &tgs (touch gesture on/off key) parameter. */
+#define TGS_TOG 0
+#define TGS_ON 1
+#define TGS_OFF 2

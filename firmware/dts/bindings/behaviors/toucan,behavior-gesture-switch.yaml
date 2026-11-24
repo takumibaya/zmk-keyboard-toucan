@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT
+
+description: Touch gesture on/off key (param1 TGS_TOG / TGS_ON / TGS_OFF)
+
+compatible: "toucan,behavior-gesture-switch"
+
+include: one_param.yaml

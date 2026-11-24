@@ -67,6 +67,15 @@ config TOUCAN_STUDIO_POINTER
       Acceleration parameters (zmk-pointing-acceleration-alpha fork) and
       the cursor / scroll multipliers of the runtime scalers.
 
+config TOUCAN_STUDIO_GESTURE
+    bool "Runtime touch gesture settings over toucan__studio"
+    default y
+    depends on TOUCAN_TOUCH_GESTURES && TOUCAN_BEHAVIOR_GESTURE_SWITCH
+    depends on SETTINGS && ZMK_BEHAVIOR_LOCAL_IDS
+    help
+      Tap-to-click (and rim scroll) parameters with save / discard /
+      restore, and the state of the on/off key.
+
 endif # TOUCAN_STUDIO
 
 config TOUCAN_BEHAVIOR_RUNTIME_MACRO
@@ -84,3 +93,27 @@ config TOUCAN_INPUT_PROCESSOR_RUNTIME_SCALER
     help
       Needed whenever the input listener references the runtime scalers
       (also without Studio), so it does not depend on TOUCAN_STUDIO.
+
+config TOUCAN_TOUCH_GESTURES
+    bool
+    default y
+    depends on DT_HAS_TOUCAN_INPUT_GESTURES_ENABLED
+    depends on ZMK_POINTING
+    depends on !ZMK_SPLIT || ZMK_SPLIT_ROLE_CENTRAL
+    help
+      Needed whenever an input listener uses the gestures node as its
+      device (also without Studio), so it does not depend on TOUCAN_STUDIO.
+
+config TOUCAN_TOUCH_GESTURES_INIT_PRIORITY
+    int "Touch gestures device init priority"
+    default 99
+    depends on TOUCAN_TOUCH_GESTURES
+    help
+      POST_KERNEL priority; must come after the source input device
+      (e.g. ZMK_INPUT_SPLIT_INIT_PRIORITY) and the click behavior.
+
+config TOUCAN_BEHAVIOR_GESTURE_SWITCH
+    bool
+    default y
+    depends on DT_HAS_TOUCAN_BEHAVIOR_GESTURE_SWITCH_ENABLED
+    depends on TOUCAN_TOUCH_GESTURES

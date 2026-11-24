@@ -67,3 +67,6 @@ toucan.studio.MacroWriteResult.total              int_size:IS_8
 toucan.studio.PointerInfo.y_boost_step            int_size:IS_16
 toucan.studio.PointerCurveInfo.curves            int_size:IS_8
 toucan.studio.Pointer.activity                    int_size:IS_8
+
+# TouchGestureParams stays uint32 so any out-of-range value decodes and gets OUT_OF_RANGE.
+toucan.studio.TouchGestureInfo.switch_behavior_id int_size:IS_16

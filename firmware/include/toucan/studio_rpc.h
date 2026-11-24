@@ -20,12 +20,13 @@
 #include <zephyr/sys/util.h>
 #include <toucan/studio.pb.h>
 
-#define TOUCAN_STUDIO_PROTOCOL_VERSION 2
+#define TOUCAN_STUDIO_PROTOCOL_VERSION 3
 
 /* Settings subtrees (Zephyr settings) owned by the features. */
 #define TOUCAN_SETTINGS_COMBO "tcn/cmb"   /* tcn/cmb/<slot> */
 #define TOUCAN_SETTINGS_MACRO "tcn/mac"   /* tcn/mac/<slot> */
 #define TOUCAN_SETTINGS_POINTER "tcn/ptr" /* single record */
+#define TOUCAN_SETTINGS_GESTURE "tcn/gst" /* single record; the on/off key uses "tcn/gsw" */
 
 /* Fill resp with an Error result. */
 void tcn_rpc_error(toucan_studio_Response *resp, toucan_studio_ErrorCode code, uint8_t field,
@@ -68,4 +69,14 @@ bool tcn_pointer_unsaved(void);
 int tcn_pointer_save(void);
 int tcn_pointer_discard(void);
 int tcn_pointer_restore_defaults(void); /* DT values in RAM and the stored record erased */
+#endif
+
+#if IS_ENABLED(CONFIG_TOUCAN_STUDIO_GESTURE)
+void tcn_gesture_info(toucan_studio_Response *resp);
+void tcn_gesture_get(toucan_studio_Response *resp);
+void tcn_gesture_set(const toucan_studio_SetTouchGestureRequest *req, toucan_studio_Response *resp);
+bool tcn_gesture_unsaved(void);
+int tcn_gesture_save(void);
+int tcn_gesture_discard(void);
+int tcn_gesture_restore_defaults(void); /* DT values in RAM, stored record erased, key back on */
 #endif

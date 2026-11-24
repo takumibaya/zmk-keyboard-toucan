@@ -35,7 +35,8 @@ BUILD_ASSERT(toucan_studio_Request_size <=
 #define BUILT_FEATURES                                                                             \
     ((IS_ENABLED(CONFIG_TOUCAN_STUDIO_COMBO) ? toucan_studio_Feature_FEATURE_COMBO : 0) |          \
      (IS_ENABLED(CONFIG_TOUCAN_STUDIO_MACRO) ? toucan_studio_Feature_FEATURE_MACRO : 0) |          \
-     (IS_ENABLED(CONFIG_TOUCAN_STUDIO_POINTER) ? toucan_studio_Feature_FEATURE_POINTER : 0))
+     (IS_ENABLED(CONFIG_TOUCAN_STUDIO_POINTER) ? toucan_studio_Feature_FEATURE_POINTER : 0) |      \
+     (IS_ENABLED(CONFIG_TOUCAN_STUDIO_GESTURE) ? toucan_studio_Feature_FEATURE_GESTURE : 0))
 
 static struct zmk_rpc_custom_subsystem_meta toucan_studio_meta = {
     .ui_urls = NULL,
@@ -105,6 +106,11 @@ static uint32_t unsaved_features(void) {
         unsaved |= toucan_studio_Feature_FEATURE_POINTER;
     }
 #endif
+#if IS_ENABLED(CONFIG_TOUCAN_STUDIO_GESTURE)
+    if (tcn_gesture_unsaved()) {
+        unsaved |= toucan_studio_Feature_FEATURE_GESTURE;
+    }
+#endif
     return unsaved;
 }
 
@@ -140,6 +146,14 @@ static int run_mask_op(enum mask_op op, uint32_t features) {
             keep_first_error(first_err, op == MASK_SAVE      ? tcn_pointer_save()
                                         : op == MASK_DISCARD ? tcn_pointer_discard()
                                                              : tcn_pointer_restore_defaults());
+    }
+#endif
+#if IS_ENABLED(CONFIG_TOUCAN_STUDIO_GESTURE)
+    if (features & toucan_studio_Feature_FEATURE_GESTURE) {
+        first_err =
+            keep_first_error(first_err, op == MASK_SAVE      ? tcn_gesture_save()
+                                        : op == MASK_DISCARD ? tcn_gesture_discard()
+                                                             : tcn_gesture_restore_defaults());
     }
 #endif
     return first_err;
@@ -237,6 +251,17 @@ static bool toucan_studio_handle(const zmk_custom_CallRequest *raw_request,
         break;
     case toucan_studio_Request_get_pointer_curve_info_tag:
         tcn_pointer_curve_info(resp);
+        break;
+#endif
+#if IS_ENABLED(CONFIG_TOUCAN_STUDIO_GESTURE)
+    case toucan_studio_Request_get_touch_gesture_settings_tag:
+        tcn_gesture_get(resp);
+        break;
+    case toucan_studio_Request_set_touch_gesture_settings_tag:
+        tcn_gesture_set(&req.op.set_touch_gesture_settings, resp);
+        break;
+    case toucan_studio_Request_get_touch_gesture_info_tag:
+        tcn_gesture_info(resp);
         break;
 #endif
     case 0:

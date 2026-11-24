@@ -1,6 +1,8 @@
 #define TOUCAN_POINTER_SMOOTH
 #include "toucan.dtsi"
 #include <behaviors/toucan_runtime_macro.dtsi>
+#include <dt-bindings/zmk/mouse.h>
+#include <dt-bindings/toucan/touch_gestures.h>
 
 &pinctrl {
     spi0_default: spi0_default {
@@ -45,6 +47,18 @@ nice_view_spi: &spi0 {
     ;
 };
 
+/ {
+    // Tap-to-click between the right half's trackpad and the listener (off by default; Studio
+    // turns it on, &tgs turns it off). Forwards everything else unchanged.
+    tcn_gestures: tcn_gestures {
+        compatible = "toucan,input-gestures";
+        device = <&glidepoint_split>;
+        bindings = <&mkp LCLK>;
+        aux-code = <TOUCAN_AUX_ABS_CODE>;
+    };
+};
+
 &glidepoint_listener {
     status = "okay";
+    device = <&tcn_gestures>;
 };

@@ -1,0 +1,13 @@
+/* SPDX-License-Identifier: MIT */
+
+#include <dt-bindings/toucan/touch_gestures.h>
+
+/ {
+    behaviors {
+        tgs: tgs {
+            compatible = "toucan,behavior-gesture-switch";
+            #binding-cells = <1>;
+            display-name = "Touch Gestures";
+        };
+    };
+};

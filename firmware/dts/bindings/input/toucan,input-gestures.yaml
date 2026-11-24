@@ -1,0 +1,62 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  Touch gestures between a trackpad input device and the zmk,input-listener that uses
+  this node as its `device` (see firmware/src/touch_gestures.c). Events go through
+  unchanged while the gestures are off. tap/rim and the tap-*/rim-* values are the
+  defaults that Studio's restore_defaults returns to.
+
+compatible: "toucan,input-gestures"
+
+properties:
+  device:
+    type: phandle
+    required: true
+    description: Source input device, e.g. the zmk,input-split proxy of the trackpad half
+  bindings:
+    type: phandle-array
+    required: true
+    description: Behavior pressed and released for a tap, e.g. <&mkp LCLK>
+  aux-code:
+    type: int
+    default: 0
+    description: EV_ABS code of the source's aux position (x | y << 11, 0..1024); 0 = none
+  click-ms:
+    type: int
+    default: 30
+    description: Time between the press and the release of the tap binding
+  contact-timeout-ms:
+    type: int
+    default: 250
+    description: |
+      A gesturing touch without any source event for this long fails open: it stops
+      gesturing and a forwarded BTN_TOUCH press is released once.
+  tap:
+    type: boolean
+    description: Tap-to-click on by default
+  tap-ms:
+    type: int
+    default: 150
+    description: Longest BTN_TOUCH press-to-release that clicks
+  tap-move:
+    type: int
+    default: 8
+    description: Most accumulated |dx|+|dy| (before acceleration) that still clicks
+  rim:
+    type: boolean
+    description: Rim scroll on by default
+  rim-width:
+    type: int
+    default: 20
+    description: Rim band where a scrolling touch starts, % of the pad radius
+  rim-start-deg:
+    type: int
+    default: 15
+    description: Angle moved in one direction along the rim before scrolling starts
+  rim-steps:
+    type: int
+    default: 6
+    description: Wheel steps per 90 degrees
+  rim-reverse:
+    type: boolean
+    description: Clockwise scrolls up (default down)
