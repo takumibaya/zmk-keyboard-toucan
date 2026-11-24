@@ -26,7 +26,7 @@ static struct held_macro {
     uint8_t source;
 #endif
     struct tcn_macro_step steps[TCN_MACRO_STEPS - 1];
-} held[TCN_MACRO_SLOTS];
+} held[CONFIG_TOUCAN_STUDIO_MACRO_HELD];
 static bool queueing;
 
 const char *tcn_runtime_macro_name(void) {
@@ -117,7 +117,9 @@ static int run_macro(struct zmk_behavior_binding *binding, struct zmk_behavior_b
     /* A queue add can invoke a behavior synchronously before it returns. */
     if (!queueing) {
         if (pressed) {
-            start_macro(binding->param1, &event);
+            if (!(tcn_macro_pending_validation & BIT(binding->param1))) {
+                start_macro(binding->param1, &event);
+            }
         } else {
             for (size_t i = 0; i < ARRAY_SIZE(held); i++) {
                 if (is_held(&held[i], binding->param1, &event)) {

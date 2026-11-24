@@ -36,8 +36,9 @@ struct write_key {
     bool valid;
 };
 
-/* Only the Studio thread touches these, except the saved cache during settings load. */
-static struct tcn_macro_record saved[TCN_MACRO_SLOTS];
+/* Records loaded at boot are not executable until behavior IDs are resolved. */
+uint8_t tcn_macro_pending_validation;
+static uint8_t dirty_slots;
 static struct write_key committed[TCN_MACRO_SLOTS];
 static struct {
     struct write_key key;
@@ -63,10 +64,7 @@ static unsigned int queue_items(const struct tcn_macro_record *record) {
 }
 
 static bool slot_unsaved(uint8_t slot) {
-    const struct tcn_macro_record *active = &tcn_macro_active[slot];
-    return active->count != saved[slot].count ||
-           memcmp(active->steps, saved[slot].steps,
-                  active->count * sizeof(active->steps[0])) != 0;
+    return (dirty_slots & BIT(slot)) != 0;
 }
 
 static void replace_slot(uint8_t slot, const struct tcn_macro_record *record) {
@@ -255,6 +253,7 @@ void tcn_macro_set_chunk(const toucan_studio_SetMacroChunkRequest *req,
             return;
         }
         replace_slot(req->slot, &staging.record);
+        dirty_slots |= BIT(req->slot);
         committed[req->slot] = staging.key;
         staging.key.valid = false;
     }
@@ -270,17 +269,11 @@ void tcn_macro_clear(const toucan_studio_SlotRequest *req, toucan_studio_Respons
         staging.key.valid = false;
     }
     replace_slot(req->slot, NULL);
+    dirty_slots |= BIT(req->slot);
     write_result(resp, req->slot, 0, 0, 0, true);
 }
 
-bool tcn_macro_unsaved(void) {
-    for (uint8_t i = 0; i < TCN_MACRO_SLOTS; i++) {
-        if (slot_unsaved(i)) {
-            return true;
-        }
-    }
-    return false;
-}
+bool tcn_macro_unsaved(void) { return dirty_slots != 0; }
 
 static int persist_slot(uint8_t slot, const struct tcn_macro_record *record) {
     char key[sizeof(TOUCAN_SETTINGS_MACRO "/255")];
@@ -298,7 +291,7 @@ int tcn_macro_save(void) {
         const struct tcn_macro_record *record = &tcn_macro_active[i];
         int err = persist_slot(i, record);
         if (!err) {
-            memcpy(&saved[i], record, record_size(record->count));
+            dirty_slots &= ~BIT(i);
         } else if (!first_error) {
             first_error = err;
         }
@@ -308,14 +301,21 @@ int tcn_macro_save(void) {
 
 int tcn_macro_discard(void) {
     staging.key.valid = false;
+    if (!dirty_slots) {
+        return 0;
+    }
     k_mutex_lock(&tcn_macro_mutex, K_FOREVER);
     for (uint8_t i = 0; i < TCN_MACRO_SLOTS; i++) {
         if (slot_unsaved(i)) {
-            memcpy(&tcn_macro_active[i], &saved[i], record_size(saved[i].count));
+            tcn_macro_active[i].count = 0;
         }
     }
     k_mutex_unlock(&tcn_macro_mutex);
-    return 0;
+    int err = settings_load_subtree(TOUCAN_SETTINGS_MACRO);
+    if (!err) {
+        dirty_slots = 0;
+    }
+    return err;
 }
 
 int tcn_macro_restore_defaults(void) {
@@ -330,9 +330,14 @@ int tcn_macro_restore_defaults(void) {
     /* Also erase slots saved by firmware built with a larger slot count. */
     for (uint8_t i = 0; i < WIRE_SLOTS; i++) {
         int err = persist_slot(i, NULL);
-        if (!err && i < TCN_MACRO_SLOTS) {
-            saved[i].count = 0;
-        } else if (err && !first_error) {
+        if (i < TCN_MACRO_SLOTS) {
+            if (err) {
+                dirty_slots |= BIT(i);
+            } else {
+                dirty_slots &= ~BIT(i);
+            }
+        }
+        if (err && !first_error) {
             first_error = err;
         }
     }
@@ -345,13 +350,18 @@ static int macro_settings_set(const char *name, size_t len, settings_read_cb rea
         return 0;
     }
     uint8_t slot = name[0] - '0';
-    struct tcn_macro_record *record = &saved[slot];
-    if (len < RECORD_HEADER_SIZE || len > sizeof(*record) || read_cb(arg, record, len) != len ||
-        record->version != TCN_MACRO_RECORD_VERSION || record->count > TCN_MACRO_STEPS ||
-        record->reserved || len != record_size(record->count)) {
+    struct tcn_macro_record record;
+    if (len < RECORD_HEADER_SIZE || len > sizeof(record) ||
+        read_cb(arg, &record, len) != len || record.version != TCN_MACRO_RECORD_VERSION ||
+        record.count > TCN_MACRO_STEPS || record.reserved || len != record_size(record.count)) {
         LOG_WRN("Ignoring invalid runtime macro record %u", slot);
-        record->count = 0;
+        replace_slot(slot, NULL);
+        return 0;
     }
+    k_mutex_lock(&tcn_macro_mutex, K_FOREVER);
+    tcn_macro_pending_validation |= BIT(slot);
+    memcpy(&tcn_macro_active[slot], &record, len);
+    k_mutex_unlock(&tcn_macro_mutex);
     return 0;
 }
 
@@ -371,13 +381,15 @@ static bool valid_record(const struct tcn_macro_record *record) {
 }
 
 static int macro_settings_commit(void) {
+    k_mutex_lock(&tcn_macro_mutex, K_FOREVER);
     for (uint8_t i = 0; i < TCN_MACRO_SLOTS; i++) {
-        if (!valid_record(&saved[i])) {
+        if ((tcn_macro_pending_validation & BIT(i)) && !valid_record(&tcn_macro_active[i])) {
             LOG_WRN("Ignoring invalid runtime macro steps in slot %u", i);
-            saved[i].count = 0;
+            tcn_macro_active[i].count = 0;
         }
-        replace_slot(i, &saved[i]);
     }
+    tcn_macro_pending_validation = 0;
+    k_mutex_unlock(&tcn_macro_mutex);
     return 0;
 }
 

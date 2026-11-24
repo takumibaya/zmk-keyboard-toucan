@@ -39,6 +39,7 @@ struct tcn_macro_record {
 
 extern struct k_mutex tcn_macro_mutex;
 extern struct tcn_macro_record tcn_macro_active[TCN_MACRO_SLOTS];
+extern uint8_t tcn_macro_pending_validation;
 
 const char *tcn_runtime_macro_name(void);
 struct zmk_behavior_binding tcn_macro_binding(const struct tcn_macro_step *step);
