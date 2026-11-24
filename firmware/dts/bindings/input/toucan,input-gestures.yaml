@@ -21,6 +21,17 @@ properties:
     type: int
     default: 0
     description: EV_ABS code of the source's aux position (x | y << 11, 0..1024); 0 = none
+  wheel-device:
+    type: phandle
+    description: |
+      toucan,input-gestures-wheel node whose zmk,input-listener (without processors) gets the
+      rim scroll's REL_WHEEL events. Rim scroll is built only with this and aux-code.
+  aux-timeout-ms:
+    type: int
+    default: 100
+    description: |
+      A scrolling rim touch whose finger keeps moving without a new aux sample for this long
+      goes back to cursor (the right skips unchanged positions, so a resting finger is fine)
   click-ms:
     type: int
     default: 30

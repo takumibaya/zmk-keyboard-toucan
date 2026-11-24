@@ -1,5 +1,5 @@
 /*
- * Touch gestures of the left half: tap-to-click on the right half's trackpad.
+ * Touch gestures of the left half: tap-to-click and rim scroll on the right half's trackpad.
  *
  * The trackpad listener uses this node (toucan,input-gestures) as its `device`. Every event of
  * the source device (the right half's split proxy) is handled here on the input thread and
@@ -10,12 +10,25 @@
  * Tap: a touch that lasts at most tap_ms (BTN_TOUCH press to release on the left's clock) and
  * moves at most tap_move (accumulated |dx|+|dy| before acceleration) invokes the click binding:
  * press, click-ms, release, on the system work queue. The cursor moves normally meanwhile. A
- * trackpad button edge, a malformed aux event, or a parameter change (Studio or the &tgs key)
- * during the touch cancels the click.
+ * trackpad button edge, a malformed aux event, a confirmed rim scroll, or a parameter change
+ * (Studio or the &tgs key) during the touch cancels the click.
  *
  * Parameters: the ones in effect (`live`) and the stored ones (`saved`, settings key tcn/gst)
  * change only under params_mutex, from the Studio RPC thread or the key. &tgs only flips the
  * on/off flags, in effect and stored at once, so Studio always shows what the key did.
+ *
+ * Rim scroll (aux coordinates, 0..1024 on both axes, centre 512): only a touch whose first aux
+ * sample lies in the rim band (radius >= (100 - rim_width)% of 512) is a candidate. The cursor
+ * moves while the angle around the centre adds up in one direction; once it reaches
+ * rim_start_deg the touch scrolls: its REL_X/REL_Y keep coming with value 0 (their sync is
+ * kept) and every aux sample turns its angle step into REL_WHEEL (rim_steps per 90 degrees,
+ * clockwise = down unless rim_reverse) on the listeners of wheel-device. Movement before that
+ * point is not replayed as wheel. Moving inwards past the band's exit radius, an angle jump
+ * over 90 degrees, moving on without a new aux sample for aux-timeout-ms (a resting finger
+ * gets none and keeps scrolling), a layer of a listener override (the scroller layers), a
+ * malformed aux event or the release end it for the rest of the touch. Aux samples follow
+ * their REL frame, so a change applies from the next REL_X, and a frame's REL_X decides for
+ * its REL_Y.
  *
  * Fail-open: when a gesturing touch gets no source event for contact-timeout-ms, it stops
  * gesturing, a forwarded BTN_TOUCH press is released once the way the right half ends a touch
@@ -26,6 +39,8 @@
  */
 
 #define DT_DRV_COMPAT toucan_input_gestures
+
+#include <stdlib.h>
 
 #include <zephyr/device.h>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
@@ -54,12 +69,37 @@ BUILD_ASSERT(DT_NUM_INST_STATUS_OKAY(DT_DRV_COMPAT) == 1,
 #define SOURCE DEVICE_DT_GET(DT_PHANDLE(NODE, device))
 #define AUX_CODE DT_PROP(NODE, aux_code)
 #define CONTACT_TIMEOUT_MS DT_PROP(NODE, contact_timeout_ms)
+#define AUX_TIMEOUT_MS DT_PROP(NODE, aux_timeout_ms)
+#define RIM_BUILT (AUX_CODE != 0 && DT_NODE_HAS_PROP(NODE, wheel_device))
+#if DT_NODE_HAS_PROP(NODE, wheel_device)
+#define WHEEL DEVICE_DT_GET(DT_PHANDLE(NODE, wheel_device))
+#else
+#define WHEEL NULL
+#endif
 
 #define CHECK_DT_DEFAULT(field, lo, hi)                                                            \
     BUILD_ASSERT(IN_RANGE(DT_PROP(NODE, field), lo, hi), "DT " #field " is out of range");
 TCN_GESTURE_TAP_RANGES(CHECK_DT_DEFAULT)
 TCN_GESTURE_RIM_RANGES(CHECK_DT_DEFAULT)
-BUILD_ASSERT(!DT_PROP(NODE, rim), "rim scroll is not built");
+BUILD_ASSERT(!DT_PROP(NODE, rim) || RIM_BUILT, "rim scroll needs aux-code and wheel-device");
+
+#define RIM_CENTER 512
+#define RIM_RADIUS 512
+#define RIM_JUMP 16384    /* 90 degrees in 1/65536 turns */
+#define RIM_QUARTER 16384 /* wheel steps are counted per 90 degrees */
+/* Net raw movement that always changes the right's 0..1024 position (1.75 / 1.375 counts per
+ * unit), so an aux sample is due; the right skips unchanged positions (aux-abs-on-change). */
+#define AUX_DUE_MOVE 2
+
+/* Layers of the listener overrides (the scroller): rim scroll yields to them. */
+#define TGS_LAYER_BIT(node, prop, idx) | BIT(DT_PROP_BY_IDX(node, prop, idx))
+#define TGS_CHILD_LAYERS(child) DT_FOREACH_PROP_ELEM(child, layers, TGS_LAYER_BIT)
+#define TGS_LISTENER_LAYERS(listener)                                                              \
+    | (DT_SAME_NODE(DT_PHANDLE(listener, device), NODE)                                            \
+           ? (0 DT_FOREACH_CHILD(listener, TGS_CHILD_LAYERS))                                      \
+           : 0)
+static const zmk_keymap_layers_state_t override_layers =
+    0 DT_FOREACH_STATUS_OKAY(zmk_input_listener, TGS_LISTENER_LAYERS);
 
 /* Watchdog marker: posted as an event of the source device and consumed here. */
 #define MARKER_TYPE INPUT_EV_MSC
@@ -105,10 +145,21 @@ static struct {
     bool armed;        /* this touch is gesturing */
     bool tap;          /* this touch may still click */
     bool touch_aux;    /* this touch carried aux coordinates */
+    bool zero_frame;   /* REL_X of this frame was zeroed: zero its REL_Y too */
     uint8_t contact;   /* armed touch counter, carried by the watchdog marker */
     uint16_t moved;
     uint32_t start_ms;
     uint32_t last_ms;
+    enum { RIM_NONE, RIM_CANDIDATE, RIM_ACTIVE, RIM_DONE } rim;
+    uint16_t rim_angle; /* last aux angle, 1/65536 turns */
+    int32_t rim_acc;    /* candidate: angle moved in one direction */
+    int32_t rim_rem;    /* active: wheel remainder, 1/RIM_QUARTER steps */
+    uint32_t rim_in2;   /* squared radius where the band starts */
+    uint32_t rim_out2;  /* squared radius below which the touch left the band */
+    uint32_t rim_start; /* rim_start_deg in 1/65536 turns */
+    int32_t aux_net[2]; /* active: raw REL_X/REL_Y since the last aux sample */
+    bool aux_due;       /* active: the finger moved enough for a new aux sample */
+    uint32_t aux_due_ms;
 } st;
 
 /* ---------------------------------------------------------------- click (system work queue) */
@@ -150,14 +201,19 @@ static K_WORK_DEFINE(click_press_work, click_press_cb);
 
 /* ---------------------------------------------------------------- input thread */
 
-static void forward(uint8_t type, uint16_t code, int32_t value, bool sync) {
+static void dispatch(const struct device *dev, uint8_t type, uint16_t code, int32_t value,
+                     bool sync) {
     STRUCT_SECTION_FOREACH(input_listener, listener) {
-        if (listener->dev == SELF) {
+        if (listener->dev == dev) {
             struct input_event evt = {
-                .dev = SELF, .type = type, .code = code, .value = value, .sync = sync};
+                .dev = dev, .type = type, .code = code, .value = value, .sync = sync};
             listener->callback(&evt);
         }
     }
+}
+
+static void forward(uint8_t type, uint16_t code, int32_t value, bool sync) {
+    dispatch(SELF, type, code, value, sync);
 }
 
 static void watchdog_expired(struct k_timer *timer) {
@@ -178,6 +234,7 @@ static void start_watchdog(uint32_t ms) {
 static void disarm(void) {
     st.armed = false;
     st.tap = false;
+    st.rim = RIM_DONE;
     k_timer_stop(&tcn_gesture_watchdog);
 }
 
@@ -188,7 +245,7 @@ static void refresh(void) {
     }
     k_spinlock_key_t key = k_spin_lock(&lock);
     st.cfg = live;
-    st.on = st.cfg.tap;
+    st.on = st.cfg.tap || (RIM_BUILT && st.cfg.rim);
     k_spin_unlock(&lock, key);
     st.generation = gen;
     if (st.armed) {
@@ -224,17 +281,96 @@ static void on_marker(int32_t contact) {
     }
 }
 
+static bool override_active(void) { return (zmk_keymap_layer_state() & override_layers) != 0; }
+
+/* Angle of (x, y) in 1/65536 turns, 0 along +x and growing towards +y (clockwise with y down).
+ * Octant reduction and atan(t) ~ t * pi/4 + 0.273 t (1 - t); error below 0.25 degrees. */
+static uint16_t angle_of(int32_t x, int32_t y) {
+    const int32_t ax = x < 0 ? -x : x;
+    const int32_t ay = y < 0 ? -y : y;
+    const bool steep = ay > ax;
+    const int64_t t = ((int64_t)(steep ? ax : ay) << 15) / MAX(steep ? ay : ax, 1);
+    int32_t angle = (int32_t)((8192 * t + ((2847 * t * (32768 - t)) >> 15)) >> 15);
+    if (steep) {
+        angle = 16384 - angle;
+    }
+    if (x < 0) {
+        angle = 32768 - angle;
+    }
+    if (y < 0) {
+        angle = 65536 - angle;
+    }
+    return (uint16_t)angle;
+}
+
+static void rim_end(void) {
+    if (st.rim == RIM_ACTIVE) {
+        LOG_DBG("Rim scroll ended");
+    }
+    st.rim = RIM_DONE;
+}
+
+static void rim_sample(uint32_t x, uint32_t y) {
+    if (override_active()) {
+        rim_end();
+        return;
+    }
+    const int32_t dx = (int32_t)x - RIM_CENTER;
+    const int32_t dy = (int32_t)y - RIM_CENTER;
+    const uint32_t r2 = dx * dx + dy * dy;
+    const uint16_t angle = angle_of(dx, dy);
+    const int16_t step = (int16_t)(angle - st.rim_angle);
+    st.rim_angle = angle;
+    st.aux_net[0] = st.aux_net[1] = 0;
+    st.aux_due = false;
+
+    if (st.rim == RIM_NONE) {
+        /* The touch's first coordinate decides whether it may scroll at all. */
+        st.rim = r2 >= st.rim_in2 ? RIM_CANDIDATE : RIM_DONE;
+        st.rim_acc = 0;
+        return;
+    }
+    if (r2 < st.rim_out2 || abs(step) > RIM_JUMP) {
+        rim_end();
+        return;
+    }
+    if (st.rim == RIM_CANDIDATE) {
+        if (step != 0) {
+            const bool reversed = st.rim_acc != 0 && (step < 0) != (st.rim_acc < 0);
+            st.rim_acc = reversed ? step : st.rim_acc + step;
+        }
+        if ((uint32_t)abs(st.rim_acc) >= st.rim_start) {
+            LOG_DBG("Rim scroll starts after %d/65536 turn", st.rim_acc);
+            st.rim = RIM_ACTIVE;
+            st.rim_rem = 0;
+            st.tap = false;
+        }
+        return;
+    }
+    const int32_t units = step * st.cfg.rim_steps + st.rim_rem;
+    const int32_t wheel = units / RIM_QUARTER;
+    st.rim_rem = units - wheel * RIM_QUARTER;
+    if (wheel != 0 && RIM_BUILT) {
+        dispatch(WHEEL, INPUT_EV_REL, INPUT_REL_WHEEL, st.cfg.rim_reverse ? wheel : -wheel, true);
+    }
+}
+
 static void on_aux(int32_t value) {
     const uint32_t x = value & 0x7FF;
     const uint32_t y = (value >> 11) & 0x7FF;
     if ((value >> 22) || x > 1024 || y > 1024) {
         LOG_DBG("Malformed aux coordinate 0x%x", value);
         st.tap = false;
+        rim_end();
         return;
     }
-    if (st.touch) {
-        st.touch_aux = true;
-        atomic_set(&aux_seen, 1);
+    if (!st.touch) {
+        return; /* not a coordinate of the current touch */
+    }
+    st.touch_aux = true;
+    atomic_set(&aux_seen, 1);
+    if (st.armed && st.rim != RIM_DONE) {
+        rim_sample(x, y);
     }
 }
 
@@ -253,6 +389,15 @@ static void touch_pressed(uint32_t now) {
     st.contact++;
     st.moved = 0;
     st.start_ms = now;
+    st.rim = RIM_DONE;
+    if (RIM_BUILT && st.cfg.rim && !override_active()) {
+        const int32_t r_in = RIM_RADIUS * (100 - st.cfg.rim_width) / 100;
+        const int32_t r_out = r_in - (RIM_RADIUS - r_in) / 2;
+        st.rim_in2 = r_in * r_in;
+        st.rim_out2 = r_out * r_out;
+        st.rim_start = (uint32_t)st.cfg.rim_start_deg * 65536 / 360;
+        st.rim = RIM_NONE;
+    }
     start_watchdog(CONTACT_TIMEOUT_MS);
 }
 
@@ -289,6 +434,32 @@ static void on_move(int32_t value) {
     }
 }
 
+/* REL_X/REL_Y value to forward: zero while the rim scrolls, decided once per frame at REL_X.
+ * Coordinates count as lost when the finger moved enough for a new aux sample (aux_due) and
+ * none came for aux-timeout-ms; a resting finger sends none and keeps the scroll. */
+static int32_t frame_value(const struct input_event *evt, uint32_t now) {
+    if (st.rim == RIM_ACTIVE) {
+        int32_t *net = &st.aux_net[evt->code == INPUT_REL_Y];
+        *net = CLAMP(*net + evt->value, -AUX_DUE_MOVE, AUX_DUE_MOVE);
+        if (!st.aux_due && (*net == AUX_DUE_MOVE || *net == -AUX_DUE_MOVE)) {
+            st.aux_due = true;
+            st.aux_due_ms = now;
+        }
+    }
+    if (evt->code == INPUT_REL_X) {
+        if (st.rim == RIM_ACTIVE &&
+            ((st.aux_due && now - st.aux_due_ms > AUX_TIMEOUT_MS) || override_active())) {
+            rim_end();
+        }
+        st.zero_frame = st.rim == RIM_ACTIVE;
+    }
+    const int32_t value = st.zero_frame ? 0 : evt->value;
+    if (evt->code == INPUT_REL_Y) {
+        st.zero_frame = false;
+    }
+    return value;
+}
+
 static void source_event(struct input_event *evt) {
     if (evt->type == MARKER_TYPE && evt->code == MARKER_CODE) {
         on_marker(evt->value);
@@ -303,6 +474,7 @@ static void source_event(struct input_event *evt) {
         return;
     }
 
+    int32_t value = evt->value;
     if (evt->type == INPUT_EV_KEY) {
         if (evt->code != INPUT_BTN_TOUCH) {
             st.tap = false; /* the trackpad reported its own button: no second click */
@@ -311,11 +483,14 @@ static void source_event(struct input_event *evt) {
         } else if (!touch_released(now)) {
             return;
         }
-    } else if (st.armed && evt->type == INPUT_EV_REL &&
+    } else if (evt->type == INPUT_EV_REL &&
                (evt->code == INPUT_REL_X || evt->code == INPUT_REL_Y)) {
-        on_move(evt->value);
+        if (st.armed) {
+            on_move(evt->value);
+        }
+        value = frame_value(evt, now);
     }
-    forward(evt->type, evt->code, evt->value, evt->sync);
+    forward(evt->type, evt->code, value, evt->sync);
 }
 
 INPUT_CALLBACK_DEFINE(SOURCE, source_event);
@@ -441,7 +616,7 @@ int tcn_gestures_switch(uint32_t op) {
     return err;
 }
 
-bool tcn_gestures_rim_available(void) { return false; }
+bool tcn_gestures_rim_available(void) { return RIM_BUILT; }
 
 bool tcn_gestures_rim_samples_seen(void) { return atomic_get(&aux_seen) != 0; }
 
@@ -484,3 +659,9 @@ SETTINGS_STATIC_HANDLER_DEFINE(tcn_gst, TOUCAN_SETTINGS_GESTURE, NULL, load_para
 
 DEVICE_DT_INST_DEFINE(0, NULL, NULL, NULL, NULL, POST_KERNEL,
                       CONFIG_TOUCAN_TOUCH_GESTURES_INIT_PRIORITY, NULL);
+
+#if DT_NODE_HAS_PROP(NODE, wheel_device)
+/* Rim scroll output: its listener (no processors) turns REL_WHEEL into HID scroll. */
+DEVICE_DT_DEFINE(DT_PHANDLE(NODE, wheel_device), NULL, NULL, NULL, NULL, POST_KERNEL,
+                 CONFIG_TOUCAN_TOUCH_GESTURES_INIT_PRIORITY, NULL);
+#endif

@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: MIT
+
+description: |
+  Output device of the rim scroll of a toucan,input-gestures node (its wheel-device). A
+  zmk,input-listener without input processors that uses this node as its `device` turns
+  the REL_WHEEL events into HID scroll, away from the cursor chain.
+
+compatible: "toucan,input-gestures-wheel"

@@ -48,13 +48,25 @@ nice_view_spi: &spi0 {
 };
 
 / {
-    // Tap-to-click between the right half's trackpad and the listener (off by default; Studio or
-    // the &tgs key, SET + G, turn it on and off). Forwards everything else unchanged.
+    // Tap-to-click and rim scroll between the right half's trackpad and the listener (both off
+    // by default; Studio or the &tgs key, SET + G, turn them on and off). Forwards everything
+    // else unchanged.
     tcn_gestures: tcn_gestures {
         compatible = "toucan,input-gestures";
         device = <&glidepoint_split>;
         bindings = <&mkp LCLK>;
         aux-code = <TOUCAN_AUX_ABS_CODE>;
+        wheel-device = <&tcn_gesture_wheel>;
+    };
+
+    // Rim scroll output: REL_WHEEL to HID without the cursor processors (accel would scale it).
+    tcn_gesture_wheel: tcn_gesture_wheel {
+        compatible = "toucan,input-gestures-wheel";
+    };
+
+    tcn_gesture_wheel_listener {
+        compatible = "zmk,input-listener";
+        device = <&tcn_gesture_wheel>;
     };
 };
 
