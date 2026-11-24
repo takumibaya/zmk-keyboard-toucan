@@ -9,7 +9,6 @@
 #include <string.h>
 #include <drivers/behavior.h>
 #include <zephyr/logging/log.h>
-#include <zmk/behavior_queue.h>
 #include <toucan/runtime_macro.h>
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
@@ -17,17 +16,18 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 K_MUTEX_DEFINE(tcn_macro_mutex);
 struct tcn_macro_record tcn_macro_active[TCN_MACRO_SLOTS];
 
-/* Preserve the release tail even when Studio replaces or clears its slot mid-press. */
-static struct held_macro {
-    uint32_t position;
+static struct macro_run {
+    struct k_work_delayable work;
+    struct zmk_behavior_binding_event event;
+    struct tcn_macro_step steps[TCN_MACRO_STEPS];
     uint8_t slot;
     uint8_t count;
-#if IS_ENABLED(CONFIG_ZMK_SPLIT)
-    uint8_t source;
-#endif
-    struct tcn_macro_step steps[TCN_MACRO_STEPS - 1];
-} held[CONFIG_TOUCAN_STUDIO_MACRO_HELD];
-static bool queueing;
+    uint8_t next;
+    uint8_t pause;
+    bool parked;
+    bool released;
+    bool tap_release_pending;
+} runs[CONFIG_TOUCAN_STUDIO_MACRO_HELD];
 
 const char *tcn_runtime_macro_name(void) {
     return DEVICE_DT_GET(DT_NODELABEL(rtm))->name;
@@ -44,104 +44,129 @@ struct zmk_behavior_binding tcn_macro_binding(const struct tcn_macro_step *step)
     };
 }
 
-static void enqueue(const struct zmk_behavior_binding_event *event,
-                    const struct tcn_macro_step *steps, uint8_t count) {
-    queueing = true;
-    for (uint8_t i = 0; i < count; i++) {
-        const struct tcn_macro_step *step = &steps[i];
-        struct zmk_behavior_binding binding = tcn_macro_binding(step);
-        int err;
-        if (step->action == TCN_MACRO_TAP) {
-            err = zmk_behavior_queue_add(event, binding, true, step->tap_ms);
-            if (!err) {
-                err = zmk_behavior_queue_add(event, binding, false, step->wait_ms);
-            }
-        } else {
-            err = zmk_behavior_queue_add(event, binding, step->action == TCN_MACRO_PRESS,
-                                         step->wait_ms);
-        }
-        if (err) {
-            LOG_WRN("Runtime macro queue failed at step %u: %d", i, err);
-            break;
-        }
-    }
-    queueing = false;
+static void invoke_step(const struct macro_run *run, const struct tcn_macro_step *step,
+                        bool pressed) {
+    struct zmk_behavior_binding binding = tcn_macro_binding(step);
+    struct zmk_behavior_binding_event event = run->event;
+    event.timestamp = k_uptime_get();
+    zmk_behavior_invoke_binding(&binding, event, pressed);
 }
 
-static bool is_held(const struct held_macro *entry, uint32_t slot,
-                    const struct zmk_behavior_binding_event *event) {
-    return entry->count && entry->slot == slot && entry->position == event->position
+static void execute_macro(struct k_work *work) {
+    struct macro_run *run =
+        CONTAINER_OF(k_work_delayable_from_work(work), struct macro_run, work);
+
+    while (run->next < run->count) {
+        if (run->next == run->pause) {
+            k_mutex_lock(&tcn_macro_mutex, K_FOREVER);
+            bool released = run->released;
+            run->parked = !released;
+            k_mutex_unlock(&tcn_macro_mutex);
+            if (!released) {
+                return;
+            }
+            run->next++;
+            continue;
+        }
+
+        const struct tcn_macro_step *step = &run->steps[run->next];
+        uint16_t delay;
+        if (step->action == TCN_MACRO_TAP && !run->tap_release_pending) {
+            invoke_step(run, step, true);
+            run->tap_release_pending = true;
+            delay = step->tap_ms;
+        } else {
+            invoke_step(run, step, step->action == TCN_MACRO_PRESS);
+            run->tap_release_pending = false;
+            run->next++;
+            delay = step->wait_ms;
+        }
+        if (delay) {
+            k_work_schedule(&run->work, K_MSEC(delay));
+            return;
+        }
+    }
+
+    k_mutex_lock(&tcn_macro_mutex, K_FOREVER);
+    run->count = 0;
+    k_mutex_unlock(&tcn_macro_mutex);
+}
+
+static bool matches_press(const struct macro_run *run, uint32_t slot,
+                          const struct zmk_behavior_binding_event *event) {
+    return run->count && !run->released && run->slot == slot &&
+           run->event.position == event->position
 #if IS_ENABLED(CONFIG_ZMK_SPLIT)
-           && entry->source == event->source
+           && run->event.source == event->source
 #endif
         ;
 }
 
-static void start_macro(uint32_t slot, const struct zmk_behavior_binding_event *event) {
-    const struct tcn_macro_record *record = &tcn_macro_active[slot];
-    uint8_t pause = 0;
-    while (pause < record->count && record->steps[pause].action != TCN_MACRO_PAUSE) {
-        pause++;
-    }
-    if (pause + 1 < record->count) {
-        struct held_macro *entry = NULL;
-        for (size_t i = 0; i < ARRAY_SIZE(held); i++) {
-            if (is_held(&held[i], slot, event)) {
-                return;
-            }
-            if (!entry && !held[i].count) {
-                entry = &held[i];
-            }
-        }
-        if (!entry) {
-            LOG_WRN("No release snapshot available for runtime macro %u", slot);
-            return;
-        }
-        entry->position = event->position;
-        entry->slot = slot;
-#if IS_ENABLED(CONFIG_ZMK_SPLIT)
-        entry->source = event->source;
-#endif
-        entry->count = record->count - pause - 1;
-        memcpy(entry->steps, &record->steps[pause + 1], entry->count * sizeof(entry->steps[0]));
-    }
-    enqueue(event, record->steps, pause);
-}
-
-static int run_macro(struct zmk_behavior_binding *binding, struct zmk_behavior_binding_event event,
-                     bool pressed) {
-    if (binding->param1 >= TCN_MACRO_SLOTS) {
+static int macro_pressed(struct zmk_behavior_binding *binding,
+                         struct zmk_behavior_binding_event event) {
+    uint32_t slot = binding->param1;
+    if (slot >= TCN_MACRO_SLOTS) {
         return ZMK_BEHAVIOR_OPAQUE;
     }
+
     k_mutex_lock(&tcn_macro_mutex, K_FOREVER);
-    /* A queue add can invoke a behavior synchronously before it returns. */
-    if (!queueing) {
-        if (pressed) {
-            if (!(tcn_macro_pending_validation & BIT(binding->param1))) {
-                start_macro(binding->param1, &event);
-            }
-        } else {
-            for (size_t i = 0; i < ARRAY_SIZE(held); i++) {
-                if (is_held(&held[i], binding->param1, &event)) {
-                    enqueue(&event, held[i].steps, held[i].count);
-                    held[i].count = 0;
-                    break;
-                }
-            }
+    const struct tcn_macro_record *record = &tcn_macro_active[slot];
+    if (!record->count || (tcn_macro_pending_validation & BIT(slot))) {
+        k_mutex_unlock(&tcn_macro_mutex);
+        return ZMK_BEHAVIOR_OPAQUE;
+    }
+
+    struct macro_run *run = NULL;
+    for (size_t i = 0; i < ARRAY_SIZE(runs); i++) {
+        if (matches_press(&runs[i], slot, &event)) {
+            k_mutex_unlock(&tcn_macro_mutex);
+            return ZMK_BEHAVIOR_OPAQUE;
+        }
+        if (!run && !runs[i].count) {
+            run = &runs[i];
+        }
+    }
+    if (!run) {
+        k_mutex_unlock(&tcn_macro_mutex);
+        LOG_WRN("No executor available for runtime macro %u", slot);
+        return ZMK_BEHAVIOR_OPAQUE;
+    }
+
+    run->slot = slot;
+    run->event = event;
+    run->count = record->count;
+    run->next = 0;
+    run->pause = record->count;
+    run->parked = false;
+    run->released = false;
+    run->tap_release_pending = false;
+    memcpy(run->steps, record->steps, record->count * sizeof(run->steps[0]));
+    for (uint8_t i = 0; i < record->count; i++) {
+        if (run->steps[i].action == TCN_MACRO_PAUSE) {
+            run->pause = i;
+            break;
         }
     }
     k_mutex_unlock(&tcn_macro_mutex);
+    k_work_schedule(&run->work, K_NO_WAIT);
     return ZMK_BEHAVIOR_OPAQUE;
-}
-
-static int macro_pressed(struct zmk_behavior_binding *binding,
-                         struct zmk_behavior_binding_event event) {
-    return run_macro(binding, event, true);
 }
 
 static int macro_released(struct zmk_behavior_binding *binding,
                           struct zmk_behavior_binding_event event) {
-    return run_macro(binding, event, false);
+    k_mutex_lock(&tcn_macro_mutex, K_FOREVER);
+    for (size_t i = 0; i < ARRAY_SIZE(runs); i++) {
+        struct macro_run *run = &runs[i];
+        if (matches_press(run, binding->param1, &event)) {
+            run->released = true;
+            if (run->parked) {
+                k_work_schedule(&run->work, K_NO_WAIT);
+            }
+            break;
+        }
+    }
+    k_mutex_unlock(&tcn_macro_mutex);
+    return ZMK_BEHAVIOR_OPAQUE;
 }
 
 #if IS_ENABLED(CONFIG_ZMK_BEHAVIOR_METADATA)
@@ -170,5 +195,12 @@ static const struct behavior_driver_api macro_api = {
 #endif
 };
 
-BEHAVIOR_DT_DEFINE(DT_NODELABEL(rtm), NULL, NULL, NULL, NULL, POST_KERNEL,
+static int macro_init(const struct device *dev) {
+    for (size_t i = 0; i < ARRAY_SIZE(runs); i++) {
+        k_work_init_delayable(&runs[i].work, execute_macro);
+    }
+    return 0;
+}
+
+BEHAVIOR_DT_DEFINE(DT_NODELABEL(rtm), macro_init, NULL, NULL, NULL, POST_KERNEL,
                    CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &macro_api);

@@ -42,19 +42,18 @@ config TOUCAN_STUDIO_MACRO_MAX_STEPS
     range 1 32
 
 config TOUCAN_STUDIO_MACRO_MAX_QUEUE_ITEMS
-    int "Behavior queue items per macro (TAP = 2, PRESS/RELEASE = 1, PAUSE = 0)"
+    int "Actions per runtime macro (TAP = 2, PRESS/RELEASE = 1, PAUSE = 0)"
     default 60
     range 1 ZMK_BEHAVIORS_QUEUE_SIZE
     help
-      Limits one macro's queue usage. Other running behaviors can still
-      occupy queue entries.
+      Limits the number of behavior invocations in one runtime macro.
 
 config TOUCAN_STUDIO_MACRO_HELD
-    int "Concurrent runtime macro release snapshots"
+    int "Concurrent runtime macro runs"
     default 2
     range 1 8
     help
-      Concurrently held &rtm keys whose post-pause steps are snapshotted.
+      Concurrently running or held &rtm macros with snapshotted steps.
       A press beyond this limit is ignored and logged.
 
 endif # TOUCAN_STUDIO_MACRO
