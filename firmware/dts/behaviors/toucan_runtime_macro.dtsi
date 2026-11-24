@@ -1,0 +1,11 @@
+/* SPDX-License-Identifier: MIT */
+
+/ {
+    behaviors {
+        rtm: rtm {
+            compatible = "toucan,behavior-runtime-macro";
+            #binding-cells = <1>;
+            display-name = "Runtime Macro";
+        };
+    };
+};

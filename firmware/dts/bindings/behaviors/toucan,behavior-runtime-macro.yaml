@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT
+
+description: Toucan runtime macro slot
+
+compatible: "toucan,behavior-runtime-macro"
+
+include: one_param.yaml

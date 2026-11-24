@@ -1,4 +1,5 @@
 #include "toucan.dtsi"
+#include <behaviors/toucan_runtime_macro.dtsi>
 
 &pinctrl {
     spi0_default: spi0_default {
