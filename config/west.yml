@@ -12,23 +12,50 @@ manifest:
       url-base: https://github.com/geeksville
     - name: nuovotaka
       url-base: https://github.com/nuovotaka
+  # 戻し用ビルド: 2026-08-09 の CI ビルド（run 31290298212、9edac0c）の時点で
+  # 各タグ・ブランチが指していた SHA に固定する（GitHub の push 履歴とコミット日付で確認）。
   projects:
+    # zmk v0.3 の app/west.yml は zephyr をブランチ（v3.5.0+zmk-fixes）で指定しているので、
+    # 同じ import 設定のまま SHA で上書きする（トップレベルの定義が import より優先される）。
+    - name: zephyr
+      remote: zmkfirmware
+      revision: dacab4875df72109b96cc8977547a0dc04875bcd # v3.5.0+zmk-fixes（2025-08-18 以降更新なし）
+      clone-depth: 1
+      import:
+        name-blocklist:
+          - ci-tools
+          - hal_altera
+          - hal_cypress
+          - hal_infineon
+          - hal_microchip
+          - hal_nxp
+          - hal_openisa
+          - hal_silabs
+          - hal_xtensa
+          - hal_st
+          - hal_ti
+          - loramac-node
+          - mcuboot
+          - mcumgr
+          - net-tools
+          - openthread
+          - edtt
+          - trusted-firmware-m
     - name: zmk
       remote: zmkfirmware
+      revision: edf5c0814fd3ea202e43aad2d68fd32e882a518c # tag v0.3（= v0.3.0、2025-08-01 以降移動なし）
       import: app/west.yml
     - name: cirque-input-module
       url: https://github.com/takumibaya/cirque-input-module
-      revision: fix/interrupt-deadlock-recovery
+      revision: dbba66ce5654e884a598fdccc77901602db79f52 # fix/interrupt-deadlock-recovery（2026-06-28 以降更新なし）
     - name: zmk-rgbled-widget
       remote: caksoylar
-      revision: main
+      revision: e6b467792a1dabef8cfa5c9fd26bfefc9c16662b # main（2026-07-09 から 2026-08-09 時点まで）
     - name: zmk-input-gestures
       url: https://github.com/takumibaya/zmk-input-gestures
-      # fix/gesture-suppression-selfheal: suppression-latch 自己回復 + NULL raw_event_1 ガード
-      # （トラックパッド突然死＋APL固定の対策。安定確認後に main へ取り込み可）
-      revision: fix/gesture-suppression-selfheal
+      revision: 9a741933e9152ce72487afb6b82caf9c73e58fa6 # fix/gesture-suppression-selfheal（2026-06-28 以降更新なし）
     - name: zmk-pointing-acceleration-alpha
       remote: nuovotaka
-      revision: main
+      revision: 780dfcd6b796063367893ff41e233773e12fb07c # main = v0.3.0（2025-09-09 から 2026-10-10 まで）
   self:
     path: config
