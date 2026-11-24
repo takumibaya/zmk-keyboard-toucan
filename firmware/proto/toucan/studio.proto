@@ -37,7 +37,7 @@ enum ErrorCode {
   ERROR_CODE_DUPLICATE = 3;      // another combo has the same key set on an overlapping layer
   ERROR_CODE_PROTECTED = 4;      // the studio unlock combo cannot be changed
   ERROR_CODE_BUSY = 5;           // keys or combos are held; retry after ~200 ms
-  ERROR_CODE_NO_SPACE = 6;       // e.g. the macro exceeds the behavior queue budget
+  ERROR_CODE_NO_SPACE = 6;       // e.g. the macro exceeds max_queue_items
   ERROR_CODE_NOT_FOUND = 7;      // no such slot
   ERROR_CODE_NOT_SUPPORTED = 8;  // feature or op not built into this firmware
   ERROR_CODE_STORAGE = 9;        // settings (flash) write failed
@@ -179,7 +179,7 @@ message MacroInfo {
   uint32 slots = 1;
   uint32 max_steps = 2;
   uint32 chunk_steps = 3;      // steps per GetMacroRequest / SetMacroChunkRequest
-  uint32 max_queue_items = 4;  // budget: TAP uses 2 items, every other action 1
+  uint32 max_queue_items = 4;  // per-macro action cap: TAP counts 2, PRESS / RELEASE 1, PAUSE 0
   Range wait_ms = 5;
   Range tap_ms = 6;
   uint32 behavior_id = 7;      // local id of the &rtm behavior; bind it with param1 = slot
