@@ -1,3 +1,7 @@
+name: zmk-keyboard-toucan
 build:
+  cmake: firmware
+  kconfig: firmware/Kconfig
   settings:
     board_root: .
+    dts_root: firmware

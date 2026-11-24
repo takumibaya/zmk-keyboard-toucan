@@ -1,0 +1,12 @@
+# Toucan firmware module. The repository root is the Zephyr module
+# (zephyr/module.yml); everything here builds only on the Studio-enabled
+# left half (central).
+
+menuconfig TOUCAN_STUDIO
+    bool "Toucan Studio custom RPC (toucan__studio)"
+    default y
+    depends on ZMK_STUDIO_RPC
+    help
+      Registers the custom Studio RPC subsystem "toucan__studio"
+      (protocol: firmware/proto/toucan/studio.proto). Requires the
+      takumibaya/zmk fork with the custom RPC subsystem.

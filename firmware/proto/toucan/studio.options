@@ -1,0 +1,69 @@
+# nanopb options for studio.proto (firmware only; the app ignores this file).
+# Every field is bounded so nanopb emits a compile-time max size for each
+# message; firmware/src/studio_rpc.c asserts the response and request limits.
+
+toucan.studio.Mask.features                       int_size:IS_16
+toucan.studio.Range.*                             int_size:IS_16
+toucan.studio.Error.field                         int_size:IS_8
+toucan.studio.Error.index                         int_size:IS_8
+
+toucan.studio.Info.protocol_version               int_size:IS_16
+toucan.studio.Info.features                       int_size:IS_16
+toucan.studio.Changes.unsaved                     int_size:IS_16
+
+toucan.studio.ComboInfo.slots                     int_size:IS_8
+toucan.studio.ComboInfo.max_keys                  int_size:IS_8
+toucan.studio.ComboInfo.key_positions             int_size:IS_8
+toucan.studio.ComboInfo.page_size                 int_size:IS_8
+toucan.studio.ComboInfo.layers                    int_size:IS_8
+
+toucan.studio.Binding.behavior_id                 int_size:IS_16
+
+toucan.studio.Combo.slot                          int_size:IS_8
+toucan.studio.Combo.positions                     max_count:6 int_size:IS_8
+toucan.studio.Combo.timeout_ms                    int_size:IS_16
+toucan.studio.Combo.require_prior_idle_ms         int_size:IS_16
+toucan.studio.Combo.layer_mask                    int_size:IS_16
+toucan.studio.Combo.flags                         int_size:IS_8
+
+toucan.studio.ListCombosRequest.start_slot        int_size:IS_8
+toucan.studio.ComboPage.total_slots               int_size:IS_8
+toucan.studio.ComboPage.combos                    max_count:3
+toucan.studio.ComboPage.next_slot                 int_size:IS_8
+toucan.studio.SlotRequest.slot                    int_size:IS_8
+
+toucan.studio.MacroInfo.slots                     int_size:IS_8
+toucan.studio.MacroInfo.max_steps                 int_size:IS_8
+toucan.studio.MacroInfo.chunk_steps               int_size:IS_8
+toucan.studio.MacroInfo.max_queue_items           int_size:IS_8
+toucan.studio.MacroInfo.behavior_id               int_size:IS_16
+
+toucan.studio.MacroStep.wait_ms                   int_size:IS_16
+toucan.studio.MacroStep.tap_ms                    int_size:IS_16
+
+toucan.studio.MacroSummary.slot                   int_size:IS_8
+toucan.studio.MacroSummary.steps                  int_size:IS_8
+toucan.studio.MacroSummary.queue_items            int_size:IS_8
+toucan.studio.MacroList.macros                    max_count:8
+
+toucan.studio.GetMacroRequest.slot                int_size:IS_8
+toucan.studio.GetMacroRequest.offset              int_size:IS_8
+toucan.studio.MacroSteps.slot                     int_size:IS_8
+toucan.studio.MacroSteps.total                    int_size:IS_8
+toucan.studio.MacroSteps.offset                   int_size:IS_8
+toucan.studio.MacroSteps.steps                    max_count:6
+
+toucan.studio.SetMacroChunkRequest.slot           int_size:IS_8
+toucan.studio.SetMacroChunkRequest.seq            int_size:IS_16
+toucan.studio.SetMacroChunkRequest.total          int_size:IS_8
+toucan.studio.SetMacroChunkRequest.offset         int_size:IS_8
+toucan.studio.SetMacroChunkRequest.steps          max_count:6
+
+toucan.studio.MacroWriteResult.slot               int_size:IS_8
+toucan.studio.MacroWriteResult.seq                int_size:IS_16
+toucan.studio.MacroWriteResult.received           int_size:IS_8
+toucan.studio.MacroWriteResult.total              int_size:IS_8
+
+toucan.studio.PointerInfo.y_boost_step            int_size:IS_16
+toucan.studio.PointerParams.*                     int_size:IS_16
+toucan.studio.Pointer.activity                    int_size:IS_8

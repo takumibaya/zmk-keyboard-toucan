@@ -1,0 +1,291 @@
+// Toucan Studio custom RPC payload (custom subsystem "toucan__studio").
+//
+// Carried in zmk.custom.CallRequest.payload / zmk.custom.CallResponse.payload
+// (cormoran custom RPC, studio.proto oneof tag 100). The firmware generates C
+// code with nanopb (studio.options); the app generates Rust with prost from
+// this same file.
+//
+// Rules shared by firmware and app:
+// - Every mutating request means "make this slot/value exactly this", so a
+//   request received twice (the 0.6.1 client retries on timeout) gives the
+//   same result. Macro writes are chunked and keyed by `seq`.
+// - Changes go to RAM first. `save` / `discard` with a Feature mask persist or
+//   revert them, like the official keymap. `restore_defaults` resets to the
+//   keymap DT defaults and erases the stored values right away.
+// - Out-of-range values are rejected with ERROR_CODE_OUT_OF_RANGE. The
+//   firmware never clamps.
+// - Every response, including the RPC envelope, fits in 256 bytes; lists are
+//   paged (combos) or chunked (macro steps).
+// - All ops require Studio to be unlocked (UNLOCK_REQUIRED meta error).
+
+syntax = "proto3";
+
+package toucan.studio;
+
+// Bits for Info.features, Changes.unsaved and Mask.features.
+enum Feature {
+  FEATURE_NONE = 0;
+  FEATURE_COMBO = 1;
+  FEATURE_MACRO = 2;
+  FEATURE_POINTER = 4;
+}
+
+enum ErrorCode {
+  ERROR_CODE_UNSPECIFIED = 0;
+  ERROR_CODE_INVALID = 1;        // undecodable or structurally invalid request
+  ERROR_CODE_OUT_OF_RANGE = 2;   // a value is outside the advertised range
+  ERROR_CODE_DUPLICATE = 3;      // another combo has the same key set on an overlapping layer
+  ERROR_CODE_PROTECTED = 4;      // the studio unlock combo cannot be changed
+  ERROR_CODE_BUSY = 5;           // keys or combos are held; retry after ~200 ms
+  ERROR_CODE_NO_SPACE = 6;       // e.g. the macro exceeds the behavior queue budget
+  ERROR_CODE_NOT_FOUND = 7;      // no such slot
+  ERROR_CODE_NOT_SUPPORTED = 8;  // feature or op not built into this firmware
+  ERROR_CODE_STORAGE = 9;        // settings (flash) write failed
+}
+
+message Empty {}
+
+message Mask {
+  uint32 features = 1;  // Feature bits
+}
+
+message Range {
+  sint32 min = 1;
+  sint32 max = 2;
+}
+
+message Error {
+  ErrorCode code = 1;
+  uint32 field = 2;  // field number (in Combo / MacroStep / PointerParams / the op message) that failed, 0 = n/a
+  uint32 index = 3;  // element index for repeated fields (combo positions, macro steps)
+}
+
+// ---------------------------------------------------------------- envelope
+
+message Request {
+  oneof op {
+    Empty get_info = 1;
+    Empty get_changes = 2;
+    Mask save = 3;              // -> changes
+    Mask discard = 4;           // -> changes
+    Mask restore_defaults = 5;  // -> changes
+
+    ListCombosRequest list_combos = 10;  // -> combos
+    SetComboRequest set_combo = 11;      // -> combo
+    SlotRequest delete_combo = 12;       // -> combo
+    SlotRequest restore_combo = 13;      // -> combo
+
+    Empty list_macros = 20;                // -> macros
+    GetMacroRequest get_macro = 21;        // -> macro
+    SetMacroChunkRequest set_macro = 22;   // -> macro_write
+    SlotRequest clear_macro = 23;          // -> macro_write
+
+    Empty get_pointer = 30;              // -> pointer
+    SetPointerRequest set_pointer = 31;  // -> pointer
+  }
+  reserved 40, 41;  // Cirque (right half) settings: not implemented
+}
+
+message Response {
+  oneof result {
+    Error error = 1;
+    Info info = 2;
+    Changes changes = 3;
+    ComboPage combos = 10;
+    Combo combo = 11;
+    MacroList macros = 20;
+    MacroSteps macro = 21;
+    MacroWriteResult macro_write = 22;
+    Pointer pointer = 30;
+  }
+  reserved 40;
+}
+
+// ---------------------------------------------------------------- info / changes
+
+message Info {
+  uint32 protocol_version = 1;  // 1 for this file
+  uint32 features = 2;          // Feature bits built into this firmware
+  ComboInfo combo = 3;          // set when FEATURE_COMBO
+  MacroInfo macro = 4;          // set when FEATURE_MACRO
+  PointerInfo pointer = 5;      // set when FEATURE_POINTER
+}
+
+message Changes {
+  uint32 unsaved = 1;  // Feature bits that have RAM changes not saved yet
+}
+
+// ---------------------------------------------------------------- combos
+
+message ComboInfo {
+  uint32 slots = 1;          // slot ids are 0..slots-1 (DT combos occupy the first ids in DT order)
+  uint32 max_keys = 2;       // positions per combo: 2..max_keys
+  uint32 key_positions = 3;  // valid key positions are 0..key_positions-1
+  uint32 page_size = 4;      // max combos per ComboPage
+  uint32 layers = 5;         // layer ids usable in layer_mask are 0..layers-1
+  Range timeout_ms = 6;
+  Range prior_idle_ms = 7;   // -1 (disabled) is always accepted as well
+}
+
+enum ComboFlag {
+  COMBO_FLAG_NONE = 0;
+  COMBO_FLAG_PROTECTED = 1;  // studio unlock combo: read-only
+  COMBO_FLAG_FROM_DT = 2;    // slot is defined in the keymap DT
+  COMBO_FLAG_MODIFIED = 4;   // differs from the DT default (always set for user-added slots)
+  COMBO_FLAG_UNSAVED = 8;    // RAM differs from the saved state
+  COMBO_FLAG_DELETED = 16;   // DT combo deleted by the user; restore_combo brings it back
+}
+
+// Same meaning as zmk.keymap.BehaviorBinding.
+message Binding {
+  uint32 behavior_id = 1;  // behavior local id
+  uint32 param1 = 2;
+  uint32 param2 = 3;
+}
+
+message Combo {
+  uint32 slot = 1;
+  repeated uint32 positions = 2;     // empty in responses when the slot is unused or deleted
+  Binding binding = 3;
+  uint32 timeout_ms = 4;
+  sint32 require_prior_idle_ms = 5;  // -1 = disabled
+  uint32 layer_mask = 6;             // bit n = layer id n; 0 = all layers
+  bool slow_release = 7;
+  uint32 flags = 8;                  // ComboFlag bits; ignored in requests
+}
+
+message ListCombosRequest {
+  uint32 start_slot = 1;
+}
+
+message ComboPage {
+  uint32 total_slots = 1;
+  repeated Combo combos = 2;  // used or DT-deleted slots >= start_slot, ascending
+  uint32 next_slot = 3;       // pass as start_slot; == total_slots when the list is complete
+}
+
+// Creates or overwrites combo.slot (full replace).
+message SetComboRequest {
+  Combo combo = 1;
+}
+
+message SlotRequest {
+  uint32 slot = 1;
+}
+
+// ---------------------------------------------------------------- macros
+
+message MacroInfo {
+  uint32 slots = 1;
+  uint32 max_steps = 2;
+  uint32 chunk_steps = 3;      // steps per GetMacroRequest / SetMacroChunkRequest
+  uint32 max_queue_items = 4;  // budget: TAP uses 2 items, every other action 1
+  Range wait_ms = 5;
+  Range tap_ms = 6;
+  uint32 behavior_id = 7;      // local id of the &rtm behavior; bind it with param1 = slot
+}
+
+enum MacroAction {
+  MACRO_ACTION_TAP = 0;                // press, hold tap_ms, release, then wait_ms
+  MACRO_ACTION_PRESS = 1;              // press, then wait_ms
+  MACRO_ACTION_RELEASE = 2;            // release, then wait_ms
+  MACRO_ACTION_PAUSE_FOR_RELEASE = 3;  // later steps run when the &rtm key is released
+}
+
+message MacroStep {
+  MacroAction action = 1;
+  Binding binding = 2;  // ignored for PAUSE_FOR_RELEASE; &rtm itself is rejected
+  uint32 wait_ms = 3;   // delay after this step
+  uint32 tap_ms = 4;    // TAP only
+}
+
+message MacroSummary {
+  uint32 slot = 1;
+  uint32 steps = 2;
+  uint32 queue_items = 3;
+  bool unsaved = 4;
+}
+
+message MacroList {
+  repeated MacroSummary macros = 1;  // one entry per slot
+}
+
+message GetMacroRequest {
+  uint32 slot = 1;
+  uint32 offset = 2;
+}
+
+message MacroSteps {
+  uint32 slot = 1;
+  uint32 total = 2;
+  uint32 offset = 3;
+  repeated MacroStep steps = 4;  // up to chunk_steps steps starting at offset
+}
+
+// One chunk of a macro write. The slot is replaced only when all `total` steps
+// of the same `seq` have arrived; until then the old content stays active.
+message SetMacroChunkRequest {
+  uint32 slot = 1;
+  uint32 seq = 2;     // write id chosen by the app, shared by all chunks of one write
+  uint32 total = 3;   // total steps of the new content (0 clears the slot)
+  uint32 offset = 4;  // index of steps[0]
+  repeated MacroStep steps = 5;
+}
+
+message MacroWriteResult {
+  uint32 slot = 1;
+  uint32 seq = 2;
+  uint32 received = 3;  // distinct steps received for this seq
+  uint32 total = 4;
+  bool committed = 5;   // all steps arrived and the slot now uses them
+}
+
+// ---------------------------------------------------------------- pointer (left half)
+
+message PointerInfo {
+  bool accel = 1;          // acceleration parameters are adjustable
+  bool xy_scale = 2;       // cursor multiplier is adjustable
+  bool scroll_scale = 3;   // scroll multiplier is adjustable
+  Range sensitivity = 4;   // x1000
+  Range min_factor = 5;    // x1000; below 1000 does not slow the cursor down
+  Range max_factor = 6;    // x1000
+  Range speed_threshold = 7;
+  Range speed_max = 8;
+  Range y_boost = 9;       // x1000
+  uint32 y_boost_step = 10;
+  Range xy_mul = 11;
+  Range xy_div = 12;
+  Range scroll_mul = 13;
+  Range scroll_div = 14;
+}
+
+message PointerParams {
+  uint32 sensitivity = 1;
+  uint32 min_factor = 2;  // must be <= max_factor
+  uint32 max_factor = 3;
+  uint32 speed_threshold = 4;  // must be < speed_max
+  uint32 speed_max = 5;
+  uint32 y_boost = 6;
+  uint32 xy_mul = 7;
+  uint32 xy_div = 8;
+  uint32 scroll_mul = 9;
+  uint32 scroll_div = 10;
+}
+
+enum PointerActivity {
+  POINTER_ACTIVITY_NONE = 0;
+  POINTER_ACTIVITY_CURSOR_CHAIN = 1;  // the cursor scaler (after accel) has processed movement since boot
+  POINTER_ACTIVITY_SCROLL_CHAIN = 2;  // the scroll scaler has processed movement since boot
+}
+
+message Pointer {
+  PointerParams current = 1;  // in effect (RAM)
+  PointerParams saved = 2;    // stored values, or the DT defaults when nothing is stored
+  bool unsaved = 3;
+  uint32 activity = 4;        // PointerActivity bits (diagnostic)
+}
+
+// Full replace of all values, RAM only. Persist with save{FEATURE_POINTER}.
+message SetPointerRequest {
+  PointerParams params = 1;
+}
