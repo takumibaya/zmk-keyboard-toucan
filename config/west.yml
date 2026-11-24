@@ -28,8 +28,8 @@ manifest:
       # （トラックパッド突然死＋APL固定の対策。安定確認後に main へ取り込み可）
       revision: fix/gesture-suppression-selfheal
     - name: zmk-pointing-acceleration-alpha
-      # nuovotaka v0.3.1 (bbf9239) + 検証付きの実行時 setter (toucan/runtime-config)
+      # nuovotaka v0.3.1 (bbf9239) + 検証付きの実行時 setter + 中間計算の int32 化 (toucan/runtime-config)
       remote: takumibaya
-      revision: 10e48ce4e487a64f157109a5e4826678401b5619
+      revision: 795c65f5b3d5ef5b665a68cbb33feaed8fb52be2
   self:
     path: config
