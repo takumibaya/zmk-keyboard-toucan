@@ -1,3 +1,4 @@
+#define TOUCAN_POINTER_SMOOTH
 #include "toucan.dtsi"
 #include <behaviors/toucan_runtime_macro.dtsi>
 

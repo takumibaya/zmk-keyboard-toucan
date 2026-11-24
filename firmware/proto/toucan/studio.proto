@@ -82,6 +82,7 @@ message Request {
 
     Empty get_pointer = 30;              // -> pointer
     SetPointerRequest set_pointer = 31;  // -> pointer
+    Empty get_pointer_curve_info = 32;  // -> pointer_curve_info
   }
   reserved 40, 41;  // Cirque (right half) settings: not implemented
 }
@@ -97,6 +98,7 @@ message Response {
     MacroSteps macro = 21;
     MacroWriteResult macro_write = 22;
     Pointer pointer = 30;
+    PointerCurveInfo pointer_curve_info = 31;
   }
   reserved 40;
 }
@@ -104,7 +106,7 @@ message Response {
 // ---------------------------------------------------------------- info / changes
 
 message Info {
-  uint32 protocol_version = 1;  // 1 for this file
+  uint32 protocol_version = 1;  // 2 for this file
   uint32 features = 2;          // Feature bits built into this firmware
   ComboInfo combo = 3;          // set when FEATURE_COMBO
   MacroInfo macro = 4;          // set when FEATURE_MACRO
@@ -259,6 +261,20 @@ message PointerInfo {
   Range scroll_div = 14;
 }
 
+enum PointerCurve {
+  POINTER_CURVE_STANDARD = 0;
+  POINTER_CURVE_SMOOTH = 1;
+}
+
+message PointerCurveInfo {
+  uint32 curves = 1;  // bit 1 << PointerCurve, for each supported curve
+  Range low_gain = 2;
+  Range high_gain = 3;
+  Range mid_speed = 4;
+  Range ramp_width = 5;
+  Range smoothing = 6;
+}
+
 message PointerParams {
   uint32 sensitivity = 1;
   uint32 min_factor = 2;  // must be <= max_factor
@@ -270,6 +286,12 @@ message PointerParams {
   uint32 xy_div = 8;
   uint32 scroll_mul = 9;
   uint32 scroll_div = 10;
+  PointerCurve curve = 11;
+  uint32 low_gain = 12;    // x1000
+  uint32 high_gain = 13;   // x1000; must be >= low_gain
+  uint32 mid_speed = 14;   // counts/report
+  uint32 ramp_width = 15;  // counts/report; must be <= mid_speed
+  uint32 smoothing = 16;  // reports
 }
 
 enum PointerActivity {
@@ -285,7 +307,8 @@ message Pointer {
   uint32 activity = 4;        // PointerActivity bits (diagnostic)
 }
 
-// Full replace of all values, RAM only. Persist with save{FEATURE_POINTER}.
+// Replace common values and values for the selected curve, RAM only.
+// Inactive curve parameters retain their current values. Persist with save{FEATURE_POINTER}.
 message SetPointerRequest {
   PointerParams params = 1;
 }

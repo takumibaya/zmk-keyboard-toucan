@@ -20,7 +20,7 @@
 #include <zephyr/sys/util.h>
 #include <toucan/studio.pb.h>
 
-#define TOUCAN_STUDIO_PROTOCOL_VERSION 1
+#define TOUCAN_STUDIO_PROTOCOL_VERSION 2
 
 /* Settings subtrees (Zephyr settings) owned by the features. */
 #define TOUCAN_SETTINGS_COMBO "tcn/cmb"   /* tcn/cmb/<slot> */
@@ -61,6 +61,7 @@ int tcn_macro_restore_defaults(void); /* all slots empty and stored macros erase
 
 #if IS_ENABLED(CONFIG_TOUCAN_STUDIO_POINTER)
 void tcn_pointer_info(toucan_studio_PointerInfo *info);
+void tcn_pointer_curve_info(toucan_studio_Response *resp);
 void tcn_pointer_get(toucan_studio_Response *resp);
 void tcn_pointer_set(const toucan_studio_SetPointerRequest *req, toucan_studio_Response *resp);
 bool tcn_pointer_unsaved(void);

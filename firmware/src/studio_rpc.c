@@ -235,6 +235,9 @@ static bool toucan_studio_handle(const zmk_custom_CallRequest *raw_request,
     case toucan_studio_Request_set_pointer_tag:
         tcn_pointer_set(&req.op.set_pointer, resp);
         break;
+    case toucan_studio_Request_get_pointer_curve_info_tag:
+        tcn_pointer_curve_info(resp);
+        break;
 #endif
     case 0:
         tcn_rpc_error(resp, toucan_studio_ErrorCode_ERROR_CODE_INVALID, 0, 0);

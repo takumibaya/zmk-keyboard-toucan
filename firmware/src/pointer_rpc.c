@@ -1,6 +1,5 @@
 /* SPDX-License-Identifier: MIT */
 
-#include <string.h>
 #include <toucan/runtime_scaler.h>
 #include <toucan/studio_rpc.h>
 #include <zephyr/init.h>
@@ -23,26 +22,32 @@ static const struct device *const scroll_scale =
     DEVICE_DT_GET_OR_NULL(DT_NODELABEL(tcn_scroll_scale));
 #endif
 
-#define ACCEL_FIELDS(X)                                                                            \
+#define STANDARD_FIELDS(X)                                                                         \
     X(sensitivity, 300, 1000)                                                                      \
     X(min_factor, 200, 1500)                                                                       \
     X(max_factor, 1000, 3000)                                                                      \
     X(speed_threshold, 100, 2000)                                                                 \
-    X(speed_max, 1000, 8000)                                                                       \
-    X(y_boost, 1000, 3000)
+    X(speed_max, 1000, 8000)
+#define BOOST_FIELDS(X) X(y_boost, 1000, 3000)
+#define SMOOTH_FIELDS(X)                                                                           \
+    X(low_gain, 200, 2000)                                                                         \
+    X(high_gain, 1000, 6000)                                                                       \
+    X(mid_speed, 1, 100)                                                                          \
+    X(ramp_width, 1, 100)                                                                         \
+    X(smoothing, 1, 16)
 #define XY_FIELDS(X) X(xy_mul, 1, 8) X(xy_div, 1, 8)
 #define SCROLL_FIELDS(X) X(scroll_mul, 1, 4) X(scroll_div, 1, 16)
 #define Y_BOOST_STEP 10
-#define POINTER_RECORD_VERSION 1
+#define POINTER_RECORD_VERSION 2
+#define POINTER_RECORD_V1_SIZE 22
 
 struct pointer_record {
-    uint16_t version;
+    uint32_t version;
     toucan_studio_PointerParams params;
 };
 
-BUILD_ASSERT(sizeof(struct pointer_record) == 22);
-
 static toucan_studio_PointerInfo caps;
+static toucan_studio_PointerCurveInfo curve_caps;
 static toucan_studio_PointerParams defaults;
 static toucan_studio_PointerParams saved;
 
@@ -52,7 +57,10 @@ static toucan_studio_PointerParams read_current(void) {
     struct accel_params live;
     if (caps.accel && accel_get_params(accel, &live) == 0) {
 #define COPY(field, min, max) params.field = live.field;
-        ACCEL_FIELDS(COPY)
+        STANDARD_FIELDS(COPY)
+        SMOOTH_FIELDS(COPY)
+        BOOST_FIELDS(COPY)
+        params.curve = live.curve;
 #undef COPY
     }
 #endif
@@ -84,7 +92,8 @@ static int pointer_init(void) {
     caps.has_##field = true;                                                                      \
     caps.field = (toucan_studio_Range){.min = lo, .max = hi};
     if (caps.accel) {
-        ACCEL_FIELDS(RANGE)
+        STANDARD_FIELDS(RANGE)
+        BOOST_FIELDS(RANGE)
         caps.y_boost_step = Y_BOOST_STEP;
     }
     if (caps.xy_scale) {
@@ -94,6 +103,15 @@ static int pointer_init(void) {
         SCROLL_FIELDS(RANGE)
     }
 #undef RANGE
+#define CURVE_RANGE(field, lo, hi)                                                               \
+    curve_caps.has_##field = true;                                                               \
+    curve_caps.field = (toucan_studio_Range){.min = lo, .max = hi};
+    if (caps.accel) {
+        curve_caps.curves = BIT(toucan_studio_PointerCurve_POINTER_CURVE_STANDARD) |
+                            BIT(toucan_studio_PointerCurve_POINTER_CURVE_SMOOTH);
+        SMOOTH_FIELDS(CURVE_RANGE)
+    }
+#undef CURVE_RANGE
     defaults = read_current();
     saved = defaults;
     return 0;
@@ -101,18 +119,33 @@ static int pointer_init(void) {
 
 SYS_INIT(pointer_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
 
-static uint8_t validate(const toucan_studio_PointerParams *p) {
+static uint8_t validate(const toucan_studio_PointerParams *p, bool all_curves) {
 #define CHECK(field, lo, hi)                                                                      \
     if (!IN_RANGE(p->field, lo, hi)) {                                                             \
         return toucan_studio_PointerParams_##field##_tag;                                         \
     }
     if (caps.accel) {
-        ACCEL_FIELDS(CHECK)
-        if (p->min_factor > p->max_factor) {
-            return toucan_studio_PointerParams_min_factor_tag;
+        if ((uint32_t)p->curve > toucan_studio_PointerCurve_POINTER_CURVE_SMOOTH) {
+            return toucan_studio_PointerParams_curve_tag;
         }
-        if (p->speed_threshold >= p->speed_max) {
-            return toucan_studio_PointerParams_speed_threshold_tag;
+        BOOST_FIELDS(CHECK)
+        if (all_curves || p->curve == toucan_studio_PointerCurve_POINTER_CURVE_STANDARD) {
+            STANDARD_FIELDS(CHECK)
+            if (p->min_factor > p->max_factor) {
+                return toucan_studio_PointerParams_min_factor_tag;
+            }
+            if (p->speed_threshold >= p->speed_max) {
+                return toucan_studio_PointerParams_speed_threshold_tag;
+            }
+        }
+        if (all_curves || p->curve == toucan_studio_PointerCurve_POINTER_CURVE_SMOOTH) {
+            SMOOTH_FIELDS(CHECK)
+            if (p->high_gain < p->low_gain) {
+                return toucan_studio_PointerParams_high_gain_tag;
+            }
+            if (p->ramp_width > p->mid_speed) {
+                return toucan_studio_PointerParams_ramp_width_tag;
+            }
         }
         if (p->y_boost % Y_BOOST_STEP) {
             return toucan_studio_PointerParams_y_boost_tag;
@@ -134,7 +167,10 @@ static int apply(const toucan_studio_PointerParams *p) {
     if (caps.accel) {
         const struct accel_params params = {
 #define COPY(field, min, max) .field = p->field,
-            ACCEL_FIELDS(COPY)
+            STANDARD_FIELDS(COPY)
+            SMOOTH_FIELDS(COPY)
+            BOOST_FIELDS(COPY)
+            .curve = p->curve,
 #undef COPY
         };
         int err = accel_set_params(accel, &params);
@@ -170,6 +206,19 @@ static uint8_t activity(void) {
 
 void tcn_pointer_info(toucan_studio_PointerInfo *info) { *info = caps; }
 
+void tcn_pointer_curve_info(toucan_studio_Response *resp) {
+    resp->which_result = toucan_studio_Response_pointer_curve_info_tag;
+    resp->result.pointer_curve_info = curve_caps;
+}
+
+static bool params_equal(const toucan_studio_PointerParams *a,
+                         const toucan_studio_PointerParams *b) {
+#define EQUAL(field, lo, hi) a->field == b->field &&
+    return STANDARD_FIELDS(EQUAL) SMOOTH_FIELDS(EQUAL) BOOST_FIELDS(EQUAL)
+           XY_FIELDS(EQUAL) SCROLL_FIELDS(EQUAL) a->curve == b->curve;
+#undef EQUAL
+}
+
 void tcn_pointer_get(toucan_studio_Response *resp) {
     toucan_studio_PointerParams current = read_current();
     resp->which_result = toucan_studio_Response_pointer_tag;
@@ -178,7 +227,7 @@ void tcn_pointer_get(toucan_studio_Response *resp) {
         .current = current,
         .has_saved = true,
         .saved = saved,
-        .unsaved = memcmp(&current, &saved, sizeof(saved)) != 0,
+        .unsaved = !params_equal(&current, &saved),
         .activity = activity(),
     };
 }
@@ -192,12 +241,23 @@ void tcn_pointer_set(const toucan_studio_SetPointerRequest *req, toucan_studio_R
         tcn_rpc_error(resp, tcn_rpc_errno_to_code(-ENOTSUP), 0, 0);
         return;
     }
-    uint8_t field = validate(&req->params);
+    uint8_t field = validate(&req->params, false);
     if (field) {
         tcn_rpc_error(resp, tcn_rpc_errno_to_code(-ERANGE), field, 0);
         return;
     }
-    int err = apply(&req->params);
+    toucan_studio_PointerParams merged = req->params;
+    if (caps.accel) {
+        const toucan_studio_PointerParams current = read_current();
+#define KEEP(field, lo, hi) merged.field = current.field;
+        if (merged.curve == toucan_studio_PointerCurve_POINTER_CURVE_STANDARD) {
+            SMOOTH_FIELDS(KEEP)
+        } else {
+            STANDARD_FIELDS(KEEP)
+        }
+#undef KEEP
+    }
+    int err = apply(&merged);
     if (err) {
         tcn_rpc_error(resp, tcn_rpc_errno_to_code(err), 0, 0);
         return;
@@ -207,7 +267,7 @@ void tcn_pointer_set(const toucan_studio_SetPointerRequest *req, toucan_studio_R
 
 bool tcn_pointer_unsaved(void) {
     toucan_studio_PointerParams current = read_current();
-    return memcmp(&current, &saved, sizeof(saved)) != 0;
+    return !params_equal(&current, &saved);
 }
 
 int tcn_pointer_save(void) {
@@ -215,7 +275,7 @@ int tcn_pointer_save(void) {
         .version = POINTER_RECORD_VERSION,
         .params = read_current(),
     };
-    if (memcmp(&record.params, &saved, sizeof(saved)) == 0) {
+    if (params_equal(&record.params, &saved)) {
         return 0;
     }
     int err = settings_save_one(TOUCAN_SETTINGS_POINTER, &record, sizeof(record));
@@ -242,13 +302,20 @@ static int load_pointer(const char *name, size_t len, settings_read_cb read_cb, 
     if (name && *name) {
         return -ENOENT;
     }
+    if (len == POINTER_RECORD_V1_SIZE) {
+        uint16_t version;
+        if (read_cb(cb_arg, &version, sizeof(version)) == sizeof(version) && version == 1) {
+            LOG_WRN("Ignoring pointer settings record version 1");
+            return 0;
+        }
+    }
     struct pointer_record record;
     if (len != sizeof(record) || read_cb(cb_arg, &record, sizeof(record)) != sizeof(record) ||
         record.version != POINTER_RECORD_VERSION) {
         LOG_WRN("Ignoring malformed or unsupported pointer settings record");
         return 0;
     }
-    uint8_t field = validate(&record.params);
+    uint8_t field = validate(&record.params, true);
     if (field) {
         LOG_WRN("Ignoring pointer settings: invalid field %u", field);
         return 0;

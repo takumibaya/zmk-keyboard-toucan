@@ -65,5 +65,5 @@ toucan.studio.MacroWriteResult.received           int_size:IS_8
 toucan.studio.MacroWriteResult.total              int_size:IS_8
 
 toucan.studio.PointerInfo.y_boost_step            int_size:IS_16
-toucan.studio.PointerParams.*                     int_size:IS_16
+toucan.studio.PointerCurveInfo.curves            int_size:IS_8
 toucan.studio.Pointer.activity                    int_size:IS_8
