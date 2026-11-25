@@ -23,9 +23,9 @@
 /* One complete set of gesture parameters (TouchGestureParams in studio.proto). */
 struct tcn_gesture_params {
     uint16_t tap_ms;       /* longest BTN_TOUCH press-to-release that clicks */
-    uint16_t tap_move;     /* most accumulated |dx|+|dy| before acceleration that clicks */
+    uint16_t tap_move;     /* peak raw Manhattan displacement from touch-down that still clicks */
     uint8_t rim_width;     /* rim band, % of the pad radius */
-    uint8_t rim_start_deg; /* angle in one direction before the rim scrolls */
+    uint8_t rim_start_deg; /* magnitude of net rotation before the rim scrolls */
     uint8_t rim_steps;     /* wheel steps per 90 degrees */
     bool tap;
     bool rim;

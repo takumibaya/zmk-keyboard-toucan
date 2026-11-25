@@ -47,19 +47,19 @@ properties:
     description: Tap-to-click on by default
   tap-ms:
     type: int
-    default: 150
+    default: 170
     description: Longest BTN_TOUCH press-to-release that clicks
   tap-move:
     type: int
-    default: 8
-    description: Most accumulated |dx|+|dy| (before acceleration) that still clicks
+    default: 44
+    description: Peak Manhattan displacement from touch-down in raw sensor counts; also gates rim detection
   rim:
     type: boolean
     description: Rim scroll on by default
   rim-width:
     type: int
     default: 15
-    description: Outer band eligible at first contact, % of the calibrated ellipse radius
+    description: Outer band required once movement exceeds tap-move, % of the calibrated ellipse radius
   rim-start-deg:
     type: int
     default: 20
