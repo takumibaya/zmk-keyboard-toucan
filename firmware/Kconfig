@@ -104,6 +104,12 @@ config TOUCAN_TOUCH_GESTURES
       Needed whenever an input listener uses the gestures node as its
       device (also without Studio), so it does not depend on TOUCAN_STUDIO.
 
+config TOUCAN_TOUCH_GESTURES_LOG_RIM
+    bool "Log rim scroll decisions and contact summaries"
+    depends on TOUCAN_TOUCH_GESTURES
+    help
+      Emits INFO logs for rim decisions and one summary per aux contact.
+
 config TOUCAN_TOUCH_GESTURES_INIT_PRIORITY
     int "Touch gestures device init priority"
     default 99

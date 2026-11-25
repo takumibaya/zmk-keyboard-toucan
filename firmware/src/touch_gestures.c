@@ -17,11 +17,11 @@
  * change only under params_mutex, from the Studio RPC thread or the key. &tgs only flips the
  * on/off flags, in effect and stored at once, so Studio always shows what the key did.
  *
- * Rim scroll (aux coordinates, 0..1024 on both axes, centre 512): only a touch whose first aux
- * sample lies in the rim band (radius >= (100 - rim_width)% of 512) is a candidate. The cursor
- * moves while the angle around the centre adds up in one direction; once it reaches
- * rim_start_deg the touch scrolls: its REL_X/REL_Y keep coming with value 0 (their sync is
- * kept) and every aux sample turns its angle step into REL_WHEEL (rim_steps per 90 degrees,
+ * Rim scroll: only a touch whose first aux sample lies within the outer rim_width percent
+ * of the calibrated ellipse (or beyond it) is a candidate. The cursor moves while the net
+ * angle accumulates; once its magnitude reaches rim_start_deg the touch scrolls: REL_X/REL_Y
+ * arriving in the following frames keep their sync but carry zero, and each aux sample
+ * turns its angle step into REL_WHEEL (rim_steps per 90 degrees,
  * clockwise = down unless rim_reverse) on the listeners of wheel-device. Movement before that
  * point is not replayed as wheel. Moving inwards past the band's exit radius, an angle jump
  * over 90 degrees, moving on without a new aux sample for aux-timeout-ms (a resting finger
@@ -83,8 +83,13 @@ TCN_GESTURE_TAP_RANGES(CHECK_DT_DEFAULT)
 TCN_GESTURE_RIM_RANGES(CHECK_DT_DEFAULT)
 BUILD_ASSERT(!DT_PROP(NODE, rim) || RIM_BUILT, "rim scroll needs aux-code and wheel-device");
 
-#define RIM_CENTER 512
-#define RIM_RADIUS 512
+#define RIM_UNIT 512
+#define RIM_LOG(...)                                                                              \
+    do {                                                                                          \
+        if (IS_ENABLED(CONFIG_TOUCAN_TOUCH_GESTURES_LOG_RIM)) {                                     \
+            LOG_INF(__VA_ARGS__);                                                                 \
+        }                                                                                         \
+    } while (0)
 #define RIM_JUMP 16384    /* 90 degrees in 1/65536 turns */
 #define RIM_QUARTER 16384 /* wheel steps are counted per 90 degrees */
 /* Net raw movement that always changes the right's 0..1024 position (1.75 / 1.375 counts per
@@ -135,6 +140,25 @@ static struct tcn_gesture_params saved = DT_DEFAULTS;
 static atomic_t generation = ATOMIC_INIT(1);
 static atomic_t aux_seen;
 
+struct rim_point {
+    uint16_t x, y;
+};
+
+/* Prior in aux units: centre (520,505), axes (380,480), slightly inside the modeled
+ * (390,495) sensor ellipse. Retain the inner of two successive extreme samples. */
+static struct rim_point rim_min = {140, 25};
+static struct rim_point rim_max = {900, 985};
+static struct rim_point rim_prev;
+
+#ifdef CONFIG_TOUCAN_TOUCH_GESTURES_LOG_RIM
+static struct {
+    uint32_t samples, last_ms, max_gap;
+    uint32_t frames, last_frame_ms, max_frame_gap;
+    struct rim_point min, max;
+    int32_t wheel;
+} rim_diag;
+#endif
+
 /* Input thread only. */
 static struct {
     struct tcn_gesture_params cfg; /* snapshot of `live` */
@@ -152,11 +176,12 @@ static struct {
     uint32_t last_ms;
     enum { RIM_NONE, RIM_CANDIDATE, RIM_ACTIVE, RIM_DONE } rim;
     uint16_t rim_angle; /* last aux angle, 1/65536 turns */
-    int32_t rim_acc;    /* candidate: angle moved in one direction */
+    int32_t rim_acc;    /* candidate: net signed angle */
     int32_t rim_rem;    /* active: wheel remainder, 1/RIM_QUARTER steps */
     uint32_t rim_in2;   /* squared radius where the band starts */
     uint32_t rim_out2;  /* squared radius below which the touch left the band */
     uint32_t rim_start; /* rim_start_deg in 1/65536 turns */
+    struct rim_point rim_min, rim_max; /* fixed for this touch */
     int32_t aux_net[2]; /* active: raw REL_X/REL_Y since the last aux sample */
     bool aux_due;       /* active: the finger moved enough for a new aux sample */
     uint32_t aux_due_ms;
@@ -231,10 +256,17 @@ static void start_watchdog(uint32_t ms) {
     k_timer_start(&tcn_gesture_watchdog, K_MSEC(ms), K_NO_WAIT);
 }
 
-static void disarm(void) {
+static void rim_end(const char *reason) {
+    if (st.rim == RIM_ACTIVE || st.rim == RIM_CANDIDATE) {
+        RIM_LOG("Rim end: %s", reason);
+    }
+    st.rim = RIM_DONE;
+}
+
+static void disarm(const char *reason) {
     st.armed = false;
     st.tap = false;
-    st.rim = RIM_DONE;
+    rim_end(reason);
     k_timer_stop(&tcn_gesture_watchdog);
 }
 
@@ -250,13 +282,13 @@ static void refresh(void) {
     st.generation = gen;
     if (st.armed) {
         LOG_DBG("Gesture settings changed during a touch; it stops gesturing");
-        disarm();
+        disarm("settings changed");
     }
 }
 
 static void fail_open(uint32_t idle_ms) {
     LOG_WRN("Trackpad silent for %u ms during a touch: gestures off until the next touch", idle_ms);
-    disarm();
+    disarm("contact timeout");
     if (st.touch) {
         st.touch = false;
         st.drop_release = true;
@@ -303,20 +335,31 @@ static uint16_t angle_of(int32_t x, int32_t y) {
     return (uint16_t)angle;
 }
 
-static void rim_end(void) {
-    if (st.rim == RIM_ACTIVE) {
-        LOG_DBG("Rim scroll ended");
-    }
-    st.rim = RIM_DONE;
+/* Doubled coordinates retain half-count centres. Prior axis spans bound |result| < 1200. */
+static int32_t rim_normalize(int32_t v, int32_t min, int32_t max) {
+    return (2 * v - min - max) * RIM_UNIT / (max - min);
 }
+
+#ifdef CONFIG_TOUCAN_TOUCH_GESTURES_LOG_RIM
+static uint32_t rim_radius(uint32_t squared) {
+    uint32_t radius = 0;
+    for (uint32_t bit = 1024; bit != 0; bit >>= 1) {
+        const uint32_t trial = radius | bit;
+        if (trial * trial <= squared) {
+            radius = trial;
+        }
+    }
+    return radius;
+}
+#endif
 
 static void rim_sample(uint32_t x, uint32_t y) {
     if (override_active()) {
-        rim_end();
+        rim_end("scroller layer");
         return;
     }
-    const int32_t dx = (int32_t)x - RIM_CENTER;
-    const int32_t dy = (int32_t)y - RIM_CENTER;
+    const int32_t dx = rim_normalize(x, st.rim_min.x, st.rim_max.x);
+    const int32_t dy = rim_normalize(y, st.rim_min.y, st.rim_max.y);
     const uint32_t r2 = dx * dx + dy * dy;
     const uint16_t angle = angle_of(dx, dy);
     const int16_t step = (int16_t)(angle - st.rim_angle);
@@ -327,20 +370,22 @@ static void rim_sample(uint32_t x, uint32_t y) {
     if (st.rim == RIM_NONE) {
         /* The touch's first coordinate decides whether it may scroll at all. */
         st.rim = r2 >= st.rim_in2 ? RIM_CANDIDATE : RIM_DONE;
+#ifdef CONFIG_TOUCAN_TOUCH_GESTURES_LOG_RIM
+        RIM_LOG("Rim start x=%u y=%u radius=%u/%u candidate=%u",
+                x, y, rim_radius(r2), RIM_UNIT, st.rim == RIM_CANDIDATE);
+#endif
         st.rim_acc = 0;
         return;
     }
     if (r2 < st.rim_out2 || abs(step) > RIM_JUMP) {
-        rim_end();
+        rim_end(r2 < st.rim_out2 ? "inner exit" : "angle jump");
         return;
     }
     if (st.rim == RIM_CANDIDATE) {
-        if (step != 0) {
-            const bool reversed = st.rim_acc != 0 && (step < 0) != (st.rim_acc < 0);
-            st.rim_acc = reversed ? step : st.rim_acc + step;
-        }
+        st.rim_acc += step;
         if ((uint32_t)abs(st.rim_acc) >= st.rim_start) {
-            LOG_DBG("Rim scroll starts after %d/65536 turn", st.rim_acc);
+            RIM_LOG("Rim confirm net=%d/65536 turn after %u ms",
+                    st.rim_acc, st.last_ms - st.start_ms);
             st.rim = RIM_ACTIVE;
             st.rim_rem = 0;
             st.tap = false;
@@ -351,7 +396,11 @@ static void rim_sample(uint32_t x, uint32_t y) {
     const int32_t wheel = units / RIM_QUARTER;
     st.rim_rem = units - wheel * RIM_QUARTER;
     if (wheel != 0 && RIM_BUILT) {
-        dispatch(WHEEL, INPUT_EV_REL, INPUT_REL_WHEEL, st.cfg.rim_reverse ? wheel : -wheel, true);
+        const int32_t output = st.cfg.rim_reverse ? wheel : -wheel;
+#ifdef CONFIG_TOUCAN_TOUCH_GESTURES_LOG_RIM
+        rim_diag.wheel += output;
+#endif
+        dispatch(WHEEL, INPUT_EV_REL, INPUT_REL_WHEEL, output, true);
     }
 }
 
@@ -359,14 +408,34 @@ static void on_aux(int32_t value) {
     const uint32_t x = value & 0x7FF;
     const uint32_t y = (value >> 11) & 0x7FF;
     if ((value >> 22) || x > 1024 || y > 1024) {
-        LOG_DBG("Malformed aux coordinate 0x%x", value);
         st.tap = false;
-        rim_end();
+        rim_end("malformed aux");
         return;
     }
     if (!st.touch) {
         return; /* not a coordinate of the current touch */
     }
+    if (RIM_BUILT) {
+        if (st.touch_aux) {
+            rim_min.x = MIN(rim_min.x, MAX(rim_prev.x, x));
+            rim_min.y = MIN(rim_min.y, MAX(rim_prev.y, y));
+            rim_max.x = MAX(rim_max.x, MIN(rim_prev.x, x));
+            rim_max.y = MAX(rim_max.y, MIN(rim_prev.y, y));
+        }
+        rim_prev = (struct rim_point){x, y};
+    }
+#ifdef CONFIG_TOUCAN_TOUCH_GESTURES_LOG_RIM
+    if (rim_diag.samples++ == 0) {
+        rim_diag.min = rim_diag.max = (struct rim_point){x, y};
+    } else {
+        rim_diag.max_gap = MAX(rim_diag.max_gap, st.last_ms - rim_diag.last_ms);
+        rim_diag.min.x = MIN(rim_diag.min.x, x);
+        rim_diag.min.y = MIN(rim_diag.min.y, y);
+        rim_diag.max.x = MAX(rim_diag.max.x, x);
+        rim_diag.max.y = MAX(rim_diag.max.y, y);
+    }
+    rim_diag.last_ms = st.last_ms;
+#endif
     st.touch_aux = true;
     atomic_set(&aux_seen, 1);
     if (st.armed && st.rim != RIM_DONE) {
@@ -376,11 +445,17 @@ static void on_aux(int32_t value) {
 
 static void touch_pressed(uint32_t now) {
     if (st.armed) {
-        disarm(); /* the previous touch ended without a release that arrived here */
+        disarm("replaced contact");
     }
     st.touch = true;
     st.drop_release = false;
     st.touch_aux = false;
+#ifdef CONFIG_TOUCAN_TOUCH_GESTURES_LOG_RIM
+    rim_diag.samples = rim_diag.max_gap = 0;
+    rim_diag.frames = rim_diag.max_frame_gap = 0;
+    rim_diag.wheel = 0;
+    rim_diag.min = rim_diag.max = (struct rim_point){0};
+#endif
     if (!st.on) {
         return;
     }
@@ -391,8 +466,10 @@ static void touch_pressed(uint32_t now) {
     st.start_ms = now;
     st.rim = RIM_DONE;
     if (RIM_BUILT && st.cfg.rim && !override_active()) {
-        const int32_t r_in = RIM_RADIUS * (100 - st.cfg.rim_width) / 100;
-        const int32_t r_out = r_in - (RIM_RADIUS - r_in) / 2;
+        st.rim_min = rim_min;
+        st.rim_max = rim_max;
+        const int32_t r_in = RIM_UNIT * (100 - st.cfg.rim_width) / 100;
+        const int32_t r_out = r_in - (RIM_UNIT - r_in) / 2;
         st.rim_in2 = r_in * r_in;
         st.rim_out2 = r_out * r_out;
         st.rim_start = (uint32_t)st.cfg.rim_start_deg * 65536 / 360;
@@ -403,6 +480,17 @@ static void touch_pressed(uint32_t now) {
 
 /* Returns false when the release must be dropped. */
 static bool touch_released(uint32_t now) {
+    rim_end("release");
+#ifdef CONFIG_TOUCAN_TOUCH_GESTURES_LOG_RIM
+    if (RIM_BUILT && (st.touch || st.drop_release)) {
+        RIM_LOG("Rim summary aux=%u max_aux_gap=%u ms frames=%u max_frame_gap=%u ms "
+                "x=%u..%u y=%u..%u cal_x=%u..%u cal_y=%u..%u wheel=%d",
+                rim_diag.samples, rim_diag.max_gap, rim_diag.frames, rim_diag.max_frame_gap,
+                rim_diag.min.x, rim_diag.max.x, rim_diag.min.y, rim_diag.max.y,
+                rim_min.x, rim_max.x, rim_min.y, rim_max.y, rim_diag.wheel);
+        /* With no aux samples, both ranges above are zero. */
+    }
+#endif
     if (st.drop_release) {
         st.drop_release = false;
         return false;
@@ -415,7 +503,7 @@ static bool touch_released(uint32_t now) {
     const uint32_t held_ms = now - st.start_ms;
     const bool click = st.tap && held_ms <= st.cfg.tap_ms;
     LOG_DBG("Touch %u ms, moved %u: %s", held_ms, st.moved, click ? "click" : "no click");
-    disarm();
+    disarm("release");
     if (click) {
         if (!atomic_cas(&click_busy, 0, 1)) {
             LOG_DBG("Previous tap click still running");
@@ -447,9 +535,12 @@ static int32_t frame_value(const struct input_event *evt, uint32_t now) {
         }
     }
     if (evt->code == INPUT_REL_X) {
-        if (st.rim == RIM_ACTIVE &&
-            ((st.aux_due && now - st.aux_due_ms > AUX_TIMEOUT_MS) || override_active())) {
-            rim_end();
+        if (st.rim == RIM_ACTIVE) {
+            if (st.aux_due && now - st.aux_due_ms > AUX_TIMEOUT_MS) {
+                rim_end("aux timeout");
+            } else if (override_active()) {
+                rim_end("scroller layer");
+            }
         }
         st.zero_frame = st.rim == RIM_ACTIVE;
     }
@@ -485,6 +576,14 @@ static void source_event(struct input_event *evt) {
         }
     } else if (evt->type == INPUT_EV_REL &&
                (evt->code == INPUT_REL_X || evt->code == INPUT_REL_Y)) {
+#ifdef CONFIG_TOUCAN_TOUCH_GESTURES_LOG_RIM
+        if (st.touch && evt->code == INPUT_REL_Y && evt->sync) {
+            if (rim_diag.frames++ != 0) {
+                rim_diag.max_frame_gap = MAX(rim_diag.max_frame_gap, now - rim_diag.last_frame_ms);
+            }
+            rim_diag.last_frame_ms = now;
+        }
+#endif
         if (st.armed) {
             on_move(evt->value);
         }

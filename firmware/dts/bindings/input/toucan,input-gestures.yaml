@@ -58,15 +58,15 @@ properties:
     description: Rim scroll on by default
   rim-width:
     type: int
-    default: 20
-    description: Rim band where a scrolling touch starts, % of the pad radius
+    default: 15
+    description: Outer band eligible at first contact, % of the calibrated ellipse radius
   rim-start-deg:
     type: int
-    default: 15
-    description: Angle moved in one direction along the rim before scrolling starts
+    default: 20
+    description: Magnitude of net rotation in ellipse-normalized degrees before scrolling starts
   rim-steps:
     type: int
-    default: 6
+    default: 4
     description: Wheel steps per 90 degrees
   rim-reverse:
     type: boolean
