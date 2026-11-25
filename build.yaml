@@ -1,29 +1,10 @@
-# This file generates the GitHub Actions matrix.
-# For simple board + shield combinations, add them to the top level board and
-# shield arrays, for more control, add individual board + shield combinations
-# to the `include` property. You can also use the `cmake-args` property to
-# pass flags to the build command, `snippet` to add a Zephyr snippet, and
-# `artifact-name` to assign a name to distinguish build outputs from each other:
-#
-# board: [ "nice_nano_v2" ]
-# shield: [ "corne_left", "corne_right" ]
-# include:
-#   - board: bdn9_rev2
-#   - board: nice_nano_v2
-#     shield: reviung41
-#   - board: nice_nano_v2
-#     shield: corne_left
-#     snippet: studio-rpc-usb-uart
-#     cmake-args: -DCONFIG_ZMK_STUDIO=y
-#     artifact-name: corne_left_with_studio
-#
+# Debug build of the left half only (branch feat/touch-gestures-debug): rim scroll
+# diagnostics over USB serial logging (CDC ACM); Studio over Bluetooth. INF log level keeps
+# ZMK's per-event debug output off so logging does not disturb the cursor.
 ---
 include:
   - board: seeeduino_xiao_ble
     shield: toucan_left nice_view_gem
-    snippet: studio-rpc-usb-uart
-    cmake-args: -DCONFIG_ZMK_STUDIO=y
-  - board: seeeduino_xiao_ble
-    shield: toucan_right
-  - board: seeeduino_xiao_ble
-    shield: settings_reset
+    snippet: zmk-usb-logging
+    cmake-args: -DCONFIG_ZMK_STUDIO=y -DCONFIG_ZMK_LOG_LEVEL_INF=y -DCONFIG_TOUCAN_TOUCH_GESTURES_LOG_RIM=y
+    artifact-name: toucan_left_rim_debug
