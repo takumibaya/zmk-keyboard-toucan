@@ -8,7 +8,7 @@
  * right half's aux coordinates (aux-code) are always consumed here.
  *
  * Tap: a touch that lasts at most tap_ms (BTN_TOUCH press to release on the left's clock) and
- * moves at most tap_move (accumulated |dx|+|dy| before acceleration) invokes the click binding:
+ * stays within tap_move (peak |x - x_down| + |y - y_down| before acceleration) invokes the binding:
  * press, click-ms, release, on the system work queue. The cursor moves normally meanwhile. A
  * trackpad button edge, a malformed aux event, a confirmed rim scroll, or a parameter change
  * (Studio or the &tgs key) during the touch cancels the click.
@@ -17,10 +17,10 @@
  * change only under params_mutex, from the Studio RPC thread or the key. &tgs only flips the
  * on/off flags, in effect and stored at once, so Studio always shows what the key did.
  *
- * Rim scroll: only a touch whose first aux sample lies within the outer rim_width percent
- * of the calibrated ellipse (or beyond it) is a candidate. The cursor moves while the net
- * angle accumulates; once its magnitude reaches rim_start_deg the touch scrolls: REL_X/REL_Y
- * arriving in the following frames keep their sync but carry zero, and each aux sample
+ * Rim scroll: a touch stays undecided until its peak excursion exceeds tap_move. The next
+ * aux sample must lie in the outer rim_width percent of the calibrated ellipse (or beyond it).
+ * The cursor moves while the net angle from that sample accumulates. At rim_start_deg,
+ * REL_X/REL_Y in the following frames keep their sync but carry zero, and each aux sample
  * turns its angle step into REL_WHEEL (rim_steps per 90 degrees,
  * clockwise = down unless rim_reverse) on the listeners of wheel-device. Movement before that
  * point is not replayed as wheel. Moving inwards past the band's exit radius, an angle jump
@@ -156,6 +156,7 @@ static struct {
     uint32_t frames, last_frame_ms, max_frame_gap;
     struct rim_point min, max;
     int32_t wheel;
+    uint32_t path;
 } rim_diag;
 #endif
 
@@ -171,7 +172,8 @@ static struct {
     bool touch_aux;    /* this touch carried aux coordinates */
     bool zero_frame;   /* REL_X of this frame was zeroed: zero its REL_Y too */
     uint8_t contact;   /* armed touch counter, carried by the watchdog marker */
-    uint16_t moved;
+    int64_t position[2]; /* raw REL displacement from touch-down */
+    uint32_t excursion;  /* peak Manhattan distance from touch-down */
     uint32_t start_ms;
     uint32_t last_ms;
     enum { RIM_NONE, RIM_CANDIDATE, RIM_ACTIVE, RIM_DONE } rim;
@@ -368,7 +370,7 @@ static void rim_sample(uint32_t x, uint32_t y) {
     st.aux_due = false;
 
     if (st.rim == RIM_NONE) {
-        /* The touch's first coordinate decides whether it may scroll at all. */
+        /* The first fresh coordinate after movement crossed tap_move decides candidacy. */
         st.rim = r2 >= st.rim_in2 ? RIM_CANDIDATE : RIM_DONE;
 #ifdef CONFIG_TOUCAN_TOUCH_GESTURES_LOG_RIM
         RIM_LOG("Rim start x=%u y=%u radius=%u/%u candidate=%u",
@@ -438,7 +440,7 @@ static void on_aux(int32_t value) {
 #endif
     st.touch_aux = true;
     atomic_set(&aux_seen, 1);
-    if (st.armed && st.rim != RIM_DONE) {
+    if (st.armed && st.rim != RIM_DONE && st.excursion > st.cfg.tap_move) {
         rim_sample(x, y);
     }
 }
@@ -451,21 +453,23 @@ static void touch_pressed(uint32_t now) {
     st.drop_release = false;
     st.touch_aux = false;
 #ifdef CONFIG_TOUCAN_TOUCH_GESTURES_LOG_RIM
+    rim_diag.path = 0;
     rim_diag.samples = rim_diag.max_gap = 0;
     rim_diag.frames = rim_diag.max_frame_gap = 0;
     rim_diag.wheel = 0;
     rim_diag.min = rim_diag.max = (struct rim_point){0};
 #endif
+    st.position[0] = st.position[1] = 0;
+    st.excursion = 0;
     if (!st.on) {
         return;
     }
     st.armed = true;
     st.tap = st.cfg.tap;
     st.contact++;
-    st.moved = 0;
     st.start_ms = now;
     st.rim = RIM_DONE;
-    if (RIM_BUILT && st.cfg.rim && !override_active()) {
+    if (RIM_BUILT && st.cfg.rim) {
         st.rim_min = rim_min;
         st.rim_max = rim_max;
         const int32_t r_in = RIM_UNIT * (100 - st.cfg.rim_width) / 100;
@@ -484,10 +488,11 @@ static bool touch_released(uint32_t now) {
 #ifdef CONFIG_TOUCAN_TOUCH_GESTURES_LOG_RIM
     if (RIM_BUILT && (st.touch || st.drop_release)) {
         RIM_LOG("Rim summary aux=%u max_aux_gap=%u ms frames=%u max_frame_gap=%u ms "
-                "x=%u..%u y=%u..%u cal_x=%u..%u cal_y=%u..%u wheel=%d",
+                "x=%u..%u y=%u..%u cal_x=%u..%u cal_y=%u..%u wheel=%d excursion=%u path=%u",
                 rim_diag.samples, rim_diag.max_gap, rim_diag.frames, rim_diag.max_frame_gap,
                 rim_diag.min.x, rim_diag.max.x, rim_diag.min.y, rim_diag.max.y,
-                rim_min.x, rim_max.x, rim_min.y, rim_max.y, rim_diag.wheel);
+                rim_min.x, rim_max.x, rim_min.y, rim_max.y,
+                rim_diag.wheel, st.excursion, rim_diag.path);
         /* With no aux samples, both ranges above are zero. */
     }
 #endif
@@ -502,7 +507,7 @@ static bool touch_released(uint32_t now) {
     }
     const uint32_t held_ms = now - st.start_ms;
     const bool click = st.tap && held_ms <= st.cfg.tap_ms;
-    LOG_DBG("Touch %u ms, moved %u: %s", held_ms, st.moved, click ? "click" : "no click");
+    LOG_DBG("Touch %u ms, excursion %u: %s", held_ms, st.excursion, click ? "click" : "no click");
     disarm("release");
     if (click) {
         if (!atomic_cas(&click_busy, 0, 1)) {
@@ -514,11 +519,20 @@ static bool touch_released(uint32_t now) {
     return true;
 }
 
-static void on_move(int32_t value) {
+static void on_move(uint16_t code, int32_t value, bool sync) {
+    const bool y = code == INPUT_REL_Y;
+    st.position[y] += value;
+#ifdef CONFIG_TOUCAN_TOUCH_GESTURES_LOG_RIM
     const uint32_t step = value < 0 ? -(uint32_t)value : (uint32_t)value;
-    st.moved = MIN((uint32_t)st.moved + MIN(step, UINT16_MAX), UINT16_MAX);
-    if (st.moved > st.cfg.tap_move) {
-        st.tap = false;
+    rim_diag.path += MIN(step, UINT32_MAX - rim_diag.path);
+#endif
+    /* Evaluate the vector after both components of the REL frame have arrived. */
+    if (y && sync) {
+        const uint64_t excursion = llabs(st.position[0]) + (uint64_t)llabs(st.position[1]);
+        st.excursion = MAX(st.excursion, (uint32_t)MIN(excursion, UINT32_MAX));
+        if (st.excursion > st.cfg.tap_move) {
+            st.tap = false;
+        }
     }
 }
 
@@ -584,8 +598,9 @@ static void source_event(struct input_event *evt) {
             rim_diag.last_frame_ms = now;
         }
 #endif
-        if (st.armed) {
-            on_move(evt->value);
+        if ((st.armed && st.excursion <= st.cfg.tap_move) ||
+            (IS_ENABLED(CONFIG_TOUCAN_TOUCH_GESTURES_LOG_RIM) && st.touch)) {
+            on_move(evt->code, evt->value, evt->sync);
         }
         value = frame_value(evt, now);
     }
