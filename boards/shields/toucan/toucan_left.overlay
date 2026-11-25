@@ -72,5 +72,6 @@ nice_view_spi: &spi0 {
 
 &glidepoint_listener {
     status = "okay";
-    device = <&tcn_gestures>;
+    // Diagnostic only: gestures are inactive; use the split source directly.
+    device = <&glidepoint_split>;
 };
