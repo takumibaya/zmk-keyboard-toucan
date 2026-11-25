@@ -10,8 +10,10 @@ including the right half's release delay. Small back-and-forth jitter does not
 accumulate, but moving past the limit and returning does not restore a tap.
 
 Rim scroll waits for that movement limit to be exceeded. The next coordinate
-must be in the calibrated rim band, and the net angle must then reach the
-configured start angle before cursor motion switches to scrolling.
+must be in the calibrated rim band. Scrolling requires a tangential arc with
+at least 35° of net rotation, even if Studio requests a smaller angle.
+Settings record version 2 ignores version 1, so the new defaults take effect
+after flashing; both gestures start disabled until enabled again.
 
 # License
 

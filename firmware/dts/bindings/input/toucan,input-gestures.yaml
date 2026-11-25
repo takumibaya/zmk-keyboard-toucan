@@ -62,8 +62,8 @@ properties:
     description: Outer band required once movement exceeds tap-move, % of the calibrated ellipse radius
   rim-start-deg:
     type: int
-    default: 20
-    description: Magnitude of net rotation in ellipse-normalized degrees before scrolling starts
+    default: 35
+    description: Net rotation before scrolling, subject to a 35-degree minimum for arc verification
   rim-steps:
     type: int
     default: 4

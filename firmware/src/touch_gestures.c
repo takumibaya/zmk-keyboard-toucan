@@ -92,6 +92,8 @@ BUILD_ASSERT(!DT_PROP(NODE, rim) || RIM_BUILT, "rim scroll needs aux-code and wh
     } while (0)
 #define RIM_JUMP 16384    /* 90 degrees in 1/65536 turns */
 #define RIM_QUARTER 16384 /* wheel steps are counted per 90 degrees */
+#define RIM_PROOF_ANGLE (65536 * 35 / 360)
+#define RIM_CHORD2 (40 * 40)
 /* Net raw movement that always changes the right's 0..1024 position (1.75 / 1.375 counts per
  * unit), so an aux sample is due; the right skips unchanged positions (aux-abs-on-change). */
 #define AUX_DUE_MOVE 2
@@ -103,8 +105,10 @@ BUILD_ASSERT(!DT_PROP(NODE, rim) || RIM_BUILT, "rim scroll needs aux-code and wh
     | (DT_SAME_NODE(DT_PHANDLE(listener, device), NODE)                                            \
            ? (0 DT_FOREACH_CHILD(listener, TGS_CHILD_LAYERS))                                      \
            : 0)
+#if !IS_ENABLED(CONFIG_TOUCAN_TOUCH_GESTURES_DIAG_NOCHAIN)
 static const zmk_keymap_layers_state_t override_layers =
     0 DT_FOREACH_STATUS_OKAY(zmk_input_listener, TGS_LISTENER_LAYERS);
+#endif
 
 /* Watchdog marker: posted as an event of the source device and consumed here. */
 #define MARKER_TYPE INPUT_EV_MSC
@@ -128,7 +132,6 @@ static const zmk_keymap_layers_state_t override_layers =
     }
 
 static const struct tcn_gesture_params dt_defaults = DT_DEFAULTS;
-static const struct zmk_behavior_binding click_binding = ZMK_KEYMAP_EXTRACT_BINDING(0, NODE);
 
 /* Written under params_mutex by the RPC and the key; the input thread copies `live` in
  * refresh() under the spinlock (it never takes the mutex, which may be held during a flash
@@ -139,6 +142,8 @@ static struct tcn_gesture_params live = DT_DEFAULTS;
 static struct tcn_gesture_params saved = DT_DEFAULTS;
 static atomic_t generation = ATOMIC_INIT(1);
 static atomic_t aux_seen;
+#if !IS_ENABLED(CONFIG_TOUCAN_TOUCH_GESTURES_DIAG_NOCHAIN)
+static const struct zmk_behavior_binding click_binding = ZMK_KEYMAP_EXTRACT_BINDING(0, NODE);
 
 struct rim_point {
     uint16_t x, y;
@@ -179,6 +184,10 @@ static struct {
     enum { RIM_NONE, RIM_CANDIDATE, RIM_ACTIVE, RIM_DONE } rim;
     uint16_t rim_angle; /* last aux angle, 1/65536 turns */
     int32_t rim_acc;    /* candidate: net signed angle */
+    int16_t chord_x, chord_y;
+    uint16_t chord_polar, first_polar, first_heading;
+    uint32_t proof_min2, proof_max2;
+    bool have_heading;
     int32_t rim_rem;    /* active: wheel remainder, 1/RIM_QUARTER steps */
     uint32_t rim_in2;   /* squared radius where the band starts */
     uint32_t rim_out2;  /* squared radius below which the touch left the band */
@@ -355,6 +364,42 @@ static uint32_t rim_radius(uint32_t squared) {
 }
 #endif
 
+/* On sufficiently long chords, a rim arc turns its heading with its polar angle.
+ * Use chord midpoints for tangency and reject sustained radial drift. */
+static bool rim_proven(int32_t x, int32_t y, uint32_t r2, uint16_t angle) {
+    st.proof_min2 = MIN(st.proof_min2, r2);
+    st.proof_max2 = MAX(st.proof_max2, r2);
+    const int32_t dx = x - st.chord_x, dy = y - st.chord_y;
+    if (dx * dx + dy * dy < RIM_CHORD2) {
+        return false;
+    }
+    const int32_t mx = x + st.chord_x, my = y + st.chord_y;
+    const int32_t radial = mx * dx + my * dy;
+    const int32_t tangent = mx * dy - my * dx;
+    if (3 * abs(radial) > abs(tangent) ||
+        st.proof_max2 - st.proof_min2 > st.proof_min2 / 4) {
+        rim_end("non-tangential motion");
+        return false;
+    }
+    const uint16_t heading = angle_of(dx, dy);
+    const uint16_t polar = st.chord_polar + (int16_t)(angle - st.chord_polar) / 2;
+    st.chord_x = x;
+    st.chord_y = y;
+    st.chord_polar = angle;
+    if (!st.have_heading) {
+        st.have_heading = true;
+        st.first_polar = polar;
+        st.first_heading = heading;
+        return false;
+    }
+    const int32_t heading_turn = (int16_t)(heading - st.first_heading);
+    const int32_t turn = (int16_t)(polar - st.first_polar);
+    return (uint32_t)abs(st.rim_acc) >= MAX(st.rim_start, RIM_PROOF_ANGLE) &&
+           abs(turn) >= RIM_PROOF_ANGLE * 2 / 3 &&
+           (turn > 0) == (heading_turn > 0) &&
+           16 * abs(heading_turn) >= 15 * abs(turn);
+}
+
 static void rim_sample(uint32_t x, uint32_t y) {
     if (override_active()) {
         rim_end("scroller layer");
@@ -377,6 +422,11 @@ static void rim_sample(uint32_t x, uint32_t y) {
                 x, y, rim_radius(r2), RIM_UNIT, st.rim == RIM_CANDIDATE);
 #endif
         st.rim_acc = 0;
+        st.chord_x = dx;
+        st.chord_y = dy;
+        st.chord_polar = angle;
+        st.proof_min2 = st.proof_max2 = r2;
+        st.have_heading = false;
         return;
     }
     if (r2 < st.rim_out2 || abs(step) > RIM_JUMP) {
@@ -385,12 +435,14 @@ static void rim_sample(uint32_t x, uint32_t y) {
     }
     if (st.rim == RIM_CANDIDATE) {
         st.rim_acc += step;
-        if ((uint32_t)abs(st.rim_acc) >= st.rim_start) {
+        if (rim_proven(dx, dy, r2, angle)) {
             RIM_LOG("Rim confirm net=%d/65536 turn after %u ms",
                     st.rim_acc, st.last_ms - st.start_ms);
             st.rim = RIM_ACTIVE;
             st.rim_rem = 0;
             st.tap = false;
+        } else if (abs(st.rim_acc) > RIM_JUMP + RIM_PROOF_ANGLE) {
+            rim_end("not a rim arc");
         }
         return;
     }
@@ -417,7 +469,7 @@ static void on_aux(int32_t value) {
     if (!st.touch) {
         return; /* not a coordinate of the current touch */
     }
-    if (RIM_BUILT) {
+    if (RIM_BUILT && st.armed && st.cfg.rim) {
         if (st.touch_aux) {
             rim_min.x = MIN(rim_min.x, MAX(rim_prev.x, x));
             rim_min.y = MIN(rim_min.y, MAX(rim_prev.y, y));
@@ -607,18 +659,20 @@ static void source_event(struct input_event *evt) {
     forward(evt->type, evt->code, value, evt->sync);
 }
 
+/* Source callback registration. */
 INPUT_CALLBACK_DEFINE(SOURCE, source_event);
+#endif
 
 /* ---------------------------------------------------------------- parameters (params_mutex) */
 
-#define GESTURE_RECORD_VERSION 1
+#define GESTURE_RECORD_VERSION 2
 
 struct gesture_record {
     uint16_t version;
     struct tcn_gesture_params params;
 };
 
-BUILD_ASSERT(sizeof(struct gesture_record) == 12, "gesture record layout (version 1) changed");
+BUILD_ASSERT(sizeof(struct gesture_record) == 12, "gesture record layout changed");
 
 bool tcn_gestures_params_equal(const struct tcn_gesture_params *a,
                                const struct tcn_gesture_params *b) {
@@ -744,9 +798,12 @@ static int load_params(const char *name, size_t len, settings_read_cb read_cb, v
         return -ENOENT;
     }
     struct gesture_record record;
-    if (len != sizeof(record) || read_cb(cb_arg, &record, sizeof(record)) != sizeof(record) ||
-        record.version != GESTURE_RECORD_VERSION) {
-        LOG_WRN("Ignoring malformed or unsupported gesture settings record");
+    if (len != sizeof(record) || read_cb(cb_arg, &record, sizeof(record)) != sizeof(record)) {
+        LOG_WRN("Ignoring malformed gesture settings record");
+        return 0;
+    }
+    if (record.version != GESTURE_RECORD_VERSION) {
+        LOG_WRN("Ignoring gesture settings record version %u; using current defaults", record.version);
         return 0;
     }
 #define CHECK(field, lo, hi)                                                                       \

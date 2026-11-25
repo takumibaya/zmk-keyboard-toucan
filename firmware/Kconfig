@@ -110,6 +110,13 @@ config TOUCAN_TOUCH_GESTURES_LOG_RIM
     help
       Emits INFO logs for rim decisions and one summary per aux contact.
 
+config TOUCAN_TOUCH_GESTURES_DIAG_NOCHAIN
+    bool "Remove the gesture input callback for latency diagnosis"
+    depends on TOUCAN_TOUCH_GESTURES
+    help
+      Leaves the gesture devices and settings available, but removes source
+      input processing. The cursor listener must use the split device directly.
+
 config TOUCAN_TOUCH_GESTURES_INIT_PRIORITY
     int "Touch gestures device init priority"
     default 99

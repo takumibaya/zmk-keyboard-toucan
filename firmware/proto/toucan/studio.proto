@@ -335,6 +335,7 @@ message TouchGestureInfo {
 }
 
 // One complete set of gesture settings. Both gestures are off by default.
+// Firmware with settings record version 2 ignores older saved values and uses DT defaults.
 message TouchGestureParams {
   bool tap = 1;              // tap-to-click
   uint32 tap_ms = 2;         // longest touch that clicks: BTN_TOUCH press to release on the left's clock,
@@ -343,7 +344,7 @@ message TouchGestureParams {
                              // in raw sensor counts before acceleration; also gates rim detection
   bool rim = 4;              // rim scroll; ignored without rim in TouchGestureInfo (must be false)
   uint32 rim_width = 5;      // outer band after tap_move is exceeded, % of the calibrated ellipse radius
-  uint32 rim_start_deg = 6;  // magnitude of net rotation before scrolling starts
+  uint32 rim_start_deg = 6;  // net rotation; firmware also requires at least 35 degrees to verify an arc
   uint32 rim_steps = 7;      // wheel steps per 90 degrees
   bool rim_reverse = 8;      // false: clockwise scrolls down, true: clockwise scrolls up
 }
